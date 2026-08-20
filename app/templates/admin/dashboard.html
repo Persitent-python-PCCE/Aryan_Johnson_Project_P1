@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Admin Dashboard</title>
+</head>
+
+<body>
+
+    <h1>Admin Dashboard</h1>
+
+    <p>
+        Welcome to the Ticket Booking administration panel.
+    </p>
+
+    <hr>
+
+    <h2>Management</h2>
+
+    <ul>
+
+        <li>
+            <a href="{{ url_for('admin.categories') }}">
+                Manage Categories
+            </a>
+        </li>
+
+        <li>
+            <a href="{{ url_for('admin.venues') }}">
+                Manage Venues
+            </a>
+        </li>
+
+        <li>
+            <a href="{{ url_for('admin.events') }}">
+                Manage Events
+            </a>
+        </li>
+
+    </ul>
+
+    <hr>
+
+    <a href="{{ url_for('auth.logout') }}">
+        Logout
+    </a>
+
+</body>
+</html>

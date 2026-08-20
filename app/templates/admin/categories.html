@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Manage Categories</title>
+</head>
+
+<body>
+
+    <h1>Manage Categories</h1>
+
+    <p>
+        <a href="{{ url_for('admin.dashboard') }}">
+            ← Dashboard
+        </a>
+    </p>
+
+    <p>
+        <a href="{{ url_for('admin.create_category') }}">
+            + Create Category
+        </a>
+    </p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <p>
+                    <strong>{{ category }}:</strong>
+                    {{ message }}
+                </p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    {% if categories %}
+
+        <table border="1" cellpadding="8">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for category in categories %}
+                    <tr>
+                        <td>{{ category.id }}</td>
+                        <td>{{ category.name }}</td>
+                        <td>
+                            {{ category.description or "-" }}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    {% else %}
+
+        <p>No categories found.</p>
+
+    {% endif %}
+
+</body>
+</html>

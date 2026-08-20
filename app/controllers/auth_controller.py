@@ -115,11 +115,13 @@ def login():
             "success"
         )
 
-        # Temporary destination until the
-        # actual customer/admin dashboards
-        # are implemented.
+        if user.role.name == "ADMIN":
+            return redirect(
+                url_for("admin.dashboard")
+            )
+
         return redirect(
-            url_for("main.health_check")
+            url_for("customer.dashboard")
         )
 
     except ValueError as exc:

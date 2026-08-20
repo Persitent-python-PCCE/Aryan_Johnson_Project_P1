@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Create Venue</title>
+</head>
+
+<body>
+
+    <h1>Create Venue</h1>
+
+    <p>
+        <a href="{{ url_for('admin.venues') }}">
+            ← Back to Venues
+        </a>
+    </p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <p>
+                    <strong>{{ category }}:</strong>
+                    {{ message }}
+                </p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <form
+        method="POST"
+        action="{{ url_for('admin.create_venue') }}"
+    >
+
+        <div>
+            <label for="name">
+                Venue Name
+            </label>
+
+            <input
+                type="text"
+                id="name"
+                name="name"
+                required
+                maxlength="150"
+            >
+        </div>
+
+        <br>
+
+        <div>
+            <label for="address">
+                Address
+            </label>
+
+            <input
+                type="text"
+                id="address"
+                name="address"
+                required
+            >
+        </div>
+
+        <br>
+
+        <div>
+            <label for="city">
+                City
+            </label>
+
+            <input
+                type="text"
+                id="city"
+                name="city"
+                required
+            >
+        </div>
+
+        <br>
+
+        <div>
+            <label for="capacity">
+                Capacity
+            </label>
+
+            <input
+                type="number"
+                id="capacity"
+                name="capacity"
+                min="1"
+                required
+            >
+        </div>
+
+        <br>
+
+        <button type="submit">
+            Create Venue
+        </button>
+
+    </form>
+
+</body>
+</html>
