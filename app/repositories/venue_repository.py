@@ -31,11 +31,7 @@ class VenueRepository:
 
     @staticmethod
     def get_all():
-        return (
-            Venue.query
-            .order_by(Venue.name.asc())
-            .all()
-        )
+        return Venue.query.order_by(Venue.name.asc()).all()
 
     @staticmethod
     def get_by_city(city):

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Login - Ticket Booking System</title>
+</head>
+
+<body>
+
+    <h1>Login</h1>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash {{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <form method="POST">
+
+        <div>
+            <label for="email">
+                Email
+            </label>
+
+            <input
+                type="email"
+                id="email"
+                name="email"
+                required
+                value="{{ request.form.get('email', '') }}"
+            >
+        </div>
+
+        <div>
+            <label for="password">
+                Password
+            </label>
+
+            <input
+                type="password"
+                id="password"
+                name="password"
+                required
+            >
+        </div>
+
+        <button type="submit">
+            Login
+        </button>
+
+    </form>
+
+    <p>
+        Don't have an account?
+        <a href="{{ url_for('auth.register') }}">
+            Register
+        </a>
+    </p>
+
+</body>
+</html>

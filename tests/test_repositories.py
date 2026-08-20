@@ -21,11 +21,12 @@ from app.models.user import User
 
 @pytest.fixture
 def app():
-    app = create_app()
-
-    app.config.update(
-        TESTING=True,
-        SQLALCHEMY_DATABASE_URI="sqlite:///:memory:",
+    app = create_app(
+        test_config={
+            "TESTING": True,
+            "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
+            "SECRET_KEY": "test-secret"
+        }
     )
 
     with app.app_context():

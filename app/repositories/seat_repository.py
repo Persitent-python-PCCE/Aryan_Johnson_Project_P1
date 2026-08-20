@@ -101,8 +101,8 @@ class SeatRepository:
     @staticmethod
     def get_by_id_for_update(seat_id):
         return (
-        db.session.query(Seat)
+            db.session.query(Seat)
         .filter(Seat.id == seat_id)
         .with_for_update()
         .first()
-    )
+        )   

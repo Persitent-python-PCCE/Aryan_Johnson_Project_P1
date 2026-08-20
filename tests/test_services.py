@@ -1,5 +1,5 @@
 from datetime import date, time
-
+from werkzeug.security import check_password_hash
 import pytest
 
 from app import create_app
@@ -15,6 +15,8 @@ from app.services.role_service import RoleService
 from app.services.user_service import UserService
 from app.services.file_service import FileService
 from app.services.booking_service import BookingRepository
+from app.services.auth_service import AuthService
+from app.repositories.role_repository import RoleRepository
 
 
 from app.models.role import Role
@@ -23,11 +25,12 @@ from app.models.user import User
 
 @pytest.fixture
 def app():
-    app = create_app()
-
-    app.config.update(
-        TESTING=True,
-        SQLALCHEMY_DATABASE_URI="sqlite:///:memory:",
+    app = create_app(
+        test_config={
+            "TESTING": True,
+            "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
+            "SECRET_KEY": "test-secret"
+        }
     )
 
     with app.app_context():
@@ -1037,3 +1040,141 @@ def test_booking_service_rolls_back_on_failure(
     )
 
     assert len(bookings) == 0
+
+
+def test_auth_service_registers_user(session):
+    role = RoleRepository.create(
+        name="CUSTOMER",
+        description="Customer"
+    )
+
+    session.commit()
+
+    user = AuthService.register(
+        name="Auth User",
+        email="AUTH@example.com",
+        password="password123"
+    )
+
+    session.commit()
+
+    assert user is not None
+    assert user.name == "Auth User"
+    assert user.email == "auth@example.com"
+    assert user.role_id == role.id
+    assert user.password_hash != "password123"
+
+    assert check_password_hash(
+        user.password_hash,
+        "password123"
+    )
+
+
+def test_auth_service_rejects_duplicate_email(session):
+    RoleRepository.create(
+        name="CUSTOMER",
+        description="Customer"
+    )
+
+    session.commit()
+
+    AuthService.register(
+        name="First User",
+        email="duplicate@example.com",
+        password="password123"
+    )
+
+    session.commit()
+
+    with pytest.raises(
+        ValueError,
+        match="Email already exists"
+    ):
+        AuthService.register(
+            name="Second User",
+            email="duplicate@example.com",
+            password="password123"
+        )
+
+
+def test_auth_service_rejects_short_password(session):
+    RoleRepository.create(
+        name="CUSTOMER",
+        description="Customer"
+    )
+
+    session.commit()
+
+    with pytest.raises(
+        ValueError,
+        match="Password must be at least 8 characters"
+    ):
+        AuthService.register(
+            name="Short Password",
+            email="short@example.com",
+            password="1234567"
+        )
+
+
+def test_auth_service_authenticate_success(session):
+    RoleRepository.create(
+        name="CUSTOMER",
+        description="Customer"
+    )
+
+    session.commit()
+
+    AuthService.register(
+        name="Login User",
+        email="login@example.com",
+        password="password123"
+    )
+
+    session.commit()
+
+    user = AuthService.authenticate(
+        "LOGIN@example.com",
+        "password123"
+    )
+
+    assert user is not None
+    assert user.email == "login@example.com"
+
+
+def test_auth_service_rejects_invalid_password(session):
+    RoleRepository.create(
+        name="CUSTOMER",
+        description="Customer"
+    )
+
+    session.commit()
+
+    AuthService.register(
+        name="Wrong Password",
+        email="wrong@example.com",
+        password="password123"
+    )
+
+    session.commit()
+
+    with pytest.raises(
+        ValueError,
+        match="Invalid email or password"
+    ):
+        AuthService.authenticate(
+            "wrong@example.com",
+            "wrong-password"
+        )
+
+
+def test_auth_service_rejects_unknown_email(session):
+    with pytest.raises(
+        ValueError,
+        match="Invalid email or password"
+    ):
+        AuthService.authenticate(
+            "unknown@example.com",
+            "password123"
+        )
+
+
