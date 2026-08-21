@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Edit Event</title>
+</head>
+
+<body>
+
+    <h1>Edit Event</h1>
+
+    <p>
+        <a href="{{ url_for('admin.events') }}">
+            ← Back to Events
+        </a>
+    </p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+
+        {% if messages %}
+
+            {% for category, message in messages %}
+
+                <p>
+                    <strong>{{ category }}:</strong>
+                    {{ message }}
+                </p>
+
+            {% endfor %}
+
+        {% endif %}
+
+    {% endwith %}
+
+
+    <form method="POST">
+
+        <p>
+            <label for="name">
+                Event Name
+            </label>
+
+            <br>
+
+            <input
+                type="text"
+                id="name"
+                name="name"
+                value="{{ event.name }}"
+                required
+            >
+        </p>
+
+
+        <p>
+            <label for="description">
+                Description
+            </label>
+
+            <br>
+
+            <textarea
+                id="description"
+                name="description"
+                rows="5"
+                cols="40"
+            >{{ event.description or "" }}</textarea>
+        </p>
+
+
+        <p>
+            <label for="category_id">
+                Category
+            </label>
+
+            <br>
+
+            <select
+                id="category_id"
+                name="category_id"
+                required
+            >
+
+                {% for category in categories %}
+
+                    <option
+                        value="{{ category.id }}"
+                        {% if category.id == event.category_id %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ category.name }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+        </p>
+
+
+        <p>
+            <label for="venue_id">
+                Venue
+            </label>
+
+            <br>
+
+            <select
+                id="venue_id"
+                name="venue_id"
+                required
+            >
+
+                {% for venue in venues %}
+
+                    <option
+                        value="{{ venue.id }}"
+                        {% if venue.id == event.venue_id %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ venue.name }} - {{ venue.city }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+        </p>
+
+
+        <p>
+            <label for="event_date">
+                Event Date
+            </label>
+
+            <br>
+
+            <input
+                type="date"
+                id="event_date"
+                name="event_date"
+                value="{{ event.event_date }}"
+                required
+            >
+        </p>
+
+
+        <p>
+            <label for="start_time">
+                Start Time
+            </label>
+
+            <br>
+
+            <input
+                type="time"
+                id="start_time"
+                name="start_time"
+                value="{{ event.start_time }}"
+                required
+            >
+        </p>
+
+
+        <p>
+            <label for="end_time">
+                End Time
+            </label>
+
+            <br>
+
+            <input
+                type="time"
+                id="end_time"
+                name="end_time"
+                value="{{ event.end_time }}"
+                required
+            >
+        </p>
+
+
+        <p>
+            <label for="status">
+                Status
+            </label>
+
+            <br>
+
+            <select
+                id="status"
+                name="status"
+            >
+
+                <option
+                    value="DRAFT"
+                    {% if event.status == "DRAFT" %}
+                        selected
+                    {% endif %}
+                >
+                    Draft
+                </option>
+
+                <option
+                    value="PUBLISHED"
+                    {% if event.status == "PUBLISHED" %}
+                        selected
+                    {% endif %}
+                >
+                    Published
+                </option>
+
+                <option
+                    value="CANCELLED"
+                    {% if event.status == "CANCELLED" %}
+                        selected
+                    {% endif %}
+                >
+                    Cancelled
+                </option>
+
+                <option
+                    value="COMPLETED"
+                    {% if event.status == "COMPLETED" %}
+                        selected
+                    {% endif %}
+                >
+                    Completed
+                </option>
+
+            </select>
+        </p>
+
+
+        <button type="submit">
+            Update Event
+        </button>
+
+    </form>
+
+</body>
+
+</html>

@@ -304,3 +304,111 @@ def create_event():
         db.session.rollback()
 
         raise
+
+
+@admin_bp.route(
+    "/events/<int:event_id>/edit",
+    methods=["GET", "POST"]
+)
+@role_required("ADMIN")
+def edit_event(event_id):
+
+    event = EventService.get_event(
+        event_id
+    )
+
+    categories = CategoryService.get_categories(
+        active_only=True
+    )
+
+    venues = VenueService.get_venues()
+
+    if request.method == "GET":
+
+        return render_template(
+            "admin/event_edit.html",
+            event=event,
+            categories=categories,
+            venues=venues
+        )
+
+    try:
+
+        name = request.form.get(
+            "name",
+            ""
+        ).strip()
+
+        description = request.form.get(
+            "description",
+            ""
+        ).strip()
+
+        category_id = int(
+            request.form.get("category_id")
+        )
+
+        venue_id = int(
+            request.form.get("venue_id")
+        )
+
+        event_date = date.fromisoformat(
+            request.form.get("event_date")
+        )
+
+        start_time = time.fromisoformat(
+            request.form.get("start_time")
+        )
+
+        end_time = time.fromisoformat(
+            request.form.get("end_time")
+        )
+
+        status = request.form.get(
+            "status",
+            "DRAFT"
+        )
+
+        EventService.update_event(
+            event_id=event_id,
+            category_id=category_id,
+            venue_id=venue_id,
+            name=name,
+            description=description,
+            event_date=event_date,
+            start_time=start_time,
+            end_time=end_time,
+            status=status
+        )
+
+        db.session.commit()
+
+        flash(
+            "Event updated successfully.",
+            "success"
+        )
+
+        return redirect(
+            url_for("admin.events")
+        )
+
+    except ValueError as exc:
+
+        db.session.rollback()
+
+        flash(
+            str(exc),
+            "danger"
+        )
+
+        return render_template(
+            "admin/event_edit.html",
+            event=event,
+            categories=categories,
+            venues=venues
+        )
+
+    except Exception:
+
+        db.session.rollback()
+        raise

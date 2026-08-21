@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Select Seats - {{ event.name }}
+    </title>
+
+</head>
+
+<body>
+
+    <p>
+
+        <a
+            href="{{ url_for(
+                'customer.event_details',
+                event_id=event.id
+            ) }}"
+        >
+            ← Back to Event
+        </a>
+
+    </p>
+
+
+    <h1>
+        Select Seats
+    </h1>
+
+    <h2>
+        {{ event.name }}
+    </h2>
+
+    <p>
+        {{ event.event_date }}
+        |
+        {{ event.start_time }} - {{ event.end_time }}
+    </p>
+
+
+    {% with messages = get_flashed_messages(
+        with_categories=true
+    ) %}
+
+        {% if messages %}
+
+            {% for category, message in messages %}
+
+                <p>
+                    <strong>
+                        {{ category }}:
+                    </strong>
+
+                    {{ message }}
+                </p>
+
+            {% endfor %}
+
+        {% endif %}
+
+    {% endwith %}
+
+
+    {% if seats %}
+
+        <form
+            method="POST"
+            action="{{ url_for(
+                'customer.book_event',
+                event_id=event.id
+            ) }}"
+        >
+
+            <table border="1" cellpadding="10">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Select
+                        </th>
+
+                        <th>
+                            Seat
+                        </th>
+
+                        <th>
+                            Row
+                        </th>
+
+                        <th>
+                            Type
+                        </th>
+
+                        <th>
+                            Price
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for seat in seats %}
+
+                        <tr>
+
+                            <td>
+
+                                <input
+                                    type="checkbox"
+                                    name="seat_ids"
+                                    value="{{ seat.id }}"
+                                >
+
+                            </td>
+
+                            <td>
+                                {{ seat.seat_number }}
+                            </td>
+
+                            <td>
+                                {{ seat.row_number }}
+                            </td>
+
+                            <td>
+                                {{ seat.seat_type }}
+                            </td>
+
+                            <td>
+                                ₹{{ seat.price }}
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+
+            <br>
+
+
+            <button type="submit">
+                Confirm Booking
+            </button>
+
+        </form>
+
+    {% else %}
+
+        <p>
+            No seats are currently available.
+        </p>
+
+    {% endif %}
+
+
+    <p>
+
+        <a href="{{ url_for('customer.bookings') }}">
+            My Bookings
+        </a>
+
+    </p>
+
+</body>
+
+</html>

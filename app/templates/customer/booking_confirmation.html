@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>
+        Booking Confirmation
+    </title>
+
+</head>
+
+<body>
+
+    <h1>
+        Booking Confirmed
+    </h1>
+
+    <p>
+        Your booking has been successfully created.
+    </p>
+
+
+    <hr>
+
+
+    <p>
+        <strong>
+            Booking Reference:
+        </strong>
+
+        {{ booking.booking_reference }}
+    </p>
+
+
+    <p>
+        <strong>
+            Event:
+        </strong>
+
+        {{ booking.event.name }}
+    </p>
+
+
+    <p>
+        <strong>
+            Date:
+        </strong>
+
+        {{ booking.event.event_date }}
+    </p>
+
+
+    <p>
+        <strong>
+            Time:
+        </strong>
+
+        {{ booking.event.start_time }}
+        -
+        {{ booking.event.end_time }}
+    </p>
+
+
+    <p>
+        <strong>
+            Total Amount:
+        </strong>
+
+        ₹{{ booking.total_amount }}
+    </p>
+
+
+    <p>
+        <strong>
+            Status:
+        </strong>
+
+        {{ booking.status }}
+    </p>
+
+
+    <h2>
+        Seats
+    </h2>
+
+
+    {% if booking.items %}
+
+        <table border="1" cellpadding="8">
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Seat
+                    </th>
+
+                    <th>
+                        Type
+                    </th>
+
+                    <th>
+                        Price
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for item in booking.items %}
+
+                    <tr>
+
+                        <td>
+                            {{ item.seat.seat_number }}
+                        </td>
+
+                        <td>
+                            {{ item.seat.seat_type }}
+                        </td>
+
+                        <td>
+                            ₹{{ item.price }}
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    {% endif %}
+
+
+    <br>
+
+
+    <a href="{{ url_for('customer.bookings') }}">
+        View My Bookings
+    </a>
+
+
+    <br>
+
+
+    <a href="{{ url_for('customer.events') }}">
+        Browse More Events
+    </a>
+
+</body>
+
+</html>

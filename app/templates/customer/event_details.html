@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>{{ event.name }}</title>
+
+</head>
+
+
+<body>
+
+    <p>
+
+        <a href="{{ url_for('customer.events') }}">
+            ← Back to Events
+        </a>
+
+    </p>
+
+
+    <h1>
+        {{ event.name }}
+    </h1>
+
+
+    <p>
+        <strong>Status:</strong>
+        {{ event.status }}
+    </p>
+
+
+    <p>
+        <strong>Date:</strong>
+        {{ event.event_date }}
+    </p>
+
+
+    <p>
+        <strong>Time:</strong>
+        {{ event.start_time }}
+        -
+        {{ event.end_time }}
+    </p>
+
+
+    <p>
+        <strong>Description:</strong>
+    </p>
+
+    <p>
+        {{ event.description or "No description available." }}
+    </p>
+
+
+    <p>
+        <strong>Category:</strong>
+
+        {% if event.category %}
+            {{ event.category.name }}
+        {% else %}
+            N/A
+        {% endif %}
+
+    </p>
+
+
+    <p>
+        <strong>Venue:</strong>
+
+        {% if event.venue %}
+
+            {{ event.venue.name }}
+
+            <br>
+
+            {{ event.venue.address }}
+
+            <br>
+
+            {{ event.venue.city }}
+
+        {% else %}
+
+            N/A
+
+        {% endif %}
+
+    </p>
+
+
+    {% if event.status == "PUBLISHED" %}
+
+        <p>
+
+            <a
+                href="{{ url_for(
+                    'customer.event_seats',
+                    event_id=event.id
+                ) }}"
+            >
+                View Available Seats
+            </a>
+
+        </p>
+
+    {% endif %}
+
+
+</body>
+
+</html>

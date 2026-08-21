@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Browse Events</title>
+</head>
+
+<body>
+
+    <h1>Browse Events</h1>
+
+    <p>
+        <a href="{{ url_for('customer.dashboard') }}">
+            ← Dashboard
+        </a>
+    </p>
+
+
+    <!-- Search and Filters -->
+
+    <form
+        method="GET"
+        action="{{ url_for('customer.events') }}"
+    >
+
+        <p>
+
+            <label for="keyword">
+                Search:
+            </label>
+
+            <input
+                type="text"
+                id="keyword"
+                name="keyword"
+                value="{{ keyword }}"
+                placeholder="Search events"
+            >
+
+        </p>
+
+
+        <p>
+
+            <label for="category_id">
+                Category:
+            </label>
+
+            <select
+                id="category_id"
+                name="category_id"
+            >
+
+                <option value="">
+                    All Categories
+                </option>
+
+                {% for category in categories %}
+
+                    <option
+                        value="{{ category.id }}"
+                        {% if selected_category == category.id %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ category.name }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </p>
+
+
+        <p>
+
+            <label for="venue_id">
+                Venue:
+            </label>
+
+            <select
+                id="venue_id"
+                name="venue_id"
+            >
+
+                <option value="">
+                    All Venues
+                </option>
+
+                {% for venue in venues %}
+
+                    <option
+                        value="{{ venue.id }}"
+                        {% if selected_venue == venue.id %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ venue.name }} - {{ venue.city }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </p>
+
+
+        <p>
+
+            <label for="event_date">
+                Date:
+            </label>
+
+            <input
+                type="date"
+                id="event_date"
+                name="event_date"
+                value="{{ selected_date }}"
+            >
+
+        </p>
+
+
+        <button type="submit">
+            Search
+        </button>
+
+        <a href="{{ url_for('customer.events') }}">
+            Clear Filters
+        </a>
+
+    </form>
+
+
+    <hr>
+
+
+    {% if events.items %}
+
+        <h2>Published Events</h2>
+
+        <table border="1" cellpadding="8">
+
+            <thead>
+
+                <tr>
+                    <th>Name</th>
+                    <th>Date</th>
+                    <th>Start</th>
+                    <th>End</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for event in events.items %}
+
+                    <tr>
+
+                        <td>
+                            {{ event.name }}
+                        </td>
+
+                        <td>
+                            {{ event.event_date }}
+                        </td>
+
+                        <td>
+                            {{ event.start_time }}
+                        </td>
+
+                        <td>
+                            {{ event.end_time }}
+                        </td>
+
+                        <td>
+                            {{ event.status }}
+                        </td>
+
+                        <td>
+
+                            <a
+                                href="{{ url_for(
+                                    'customer.event_details',
+                                    event_id=event.id
+                                ) }}"
+                            >
+                                View Details
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+
+        <!-- Pagination -->
+
+        <p>
+
+            {% if events.has_prev %}
+
+                <a
+                    href="{{ url_for(
+                        'customer.events',
+                        page=events.prev_num,
+                        keyword=keyword,
+                        category_id=selected_category,
+                        venue_id=selected_venue,
+                        event_date=selected_date
+                    ) }}"
+                >
+                    ← Previous
+                </a>
+
+            {% endif %}
+
+
+            Page {{ events.page }}
+            of {{ events.pages }}
+
+
+            {% if events.has_next %}
+
+                <a
+                    href="{{ url_for(
+                        'customer.events',
+                        page=events.next_num,
+                        keyword=keyword,
+                        category_id=selected_category,
+                        venue_id=selected_venue,
+                        event_date=selected_date
+                    ) }}"
+                >
+                    Next →
+                </a>
+
+            {% endif %}
+
+        </p>
+
+    {% else %}
+
+        <p>
+            No published events found.
+        </p>
+
+    {% endif %}
+
+</body>
+
+</html>

@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
+
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1.0"
@@ -21,27 +23,37 @@
     </p>
 
     <p>
-    <a href="{{ url_for('admin.create_event') }}">
-        + Create Event
-    </a>
+        <a href="{{ url_for('admin.create_event') }}">
+            + Create Event
+        </a>
     </p>
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% with messages = get_flashed_messages(
+        with_categories=true
+    ) %}
+
         {% if messages %}
+
             {% for category, message in messages %}
+
                 <p>
                     <strong>{{ category }}:</strong>
                     {{ message }}
                 </p>
+
             {% endfor %}
+
         {% endif %}
+
     {% endwith %}
+
 
     {% if events.items %}
 
         <table border="1" cellpadding="8">
 
             <thead>
+
                 <tr>
                     <th>ID</th>
                     <th>Name</th>
@@ -49,20 +61,53 @@
                     <th>Start Time</th>
                     <th>End Time</th>
                     <th>Status</th>
+                    <th>Actions</th>
                 </tr>
+
             </thead>
+
 
             <tbody>
 
                 {% for event in events.items %}
 
                     <tr>
-                        <td>{{ event.id }}</td>
-                        <td>{{ event.name }}</td>
-                        <td>{{ event.event_date }}</td>
-                        <td>{{ event.start_time }}</td>
-                        <td>{{ event.end_time }}</td>
-                        <td>{{ event.status }}</td>
+
+                        <td>
+                            {{ event.id }}
+                        </td>
+
+                        <td>
+                            {{ event.name }}
+                        </td>
+
+                        <td>
+                            {{ event.event_date }}
+                        </td>
+
+                        <td>
+                            {{ event.start_time }}
+                        </td>
+
+                        <td>
+                            {{ event.end_time }}
+                        </td>
+
+                        <td>
+                            {{ event.status }}
+                        </td>
+
+                        <td>
+                            <a
+                                href="{{ url_for(
+                                    'admin.edit_event',
+                                    event_id=event.id
+                                ) }}"
+                            >
+                                Edit
+                            </a>
+                        </td>
+
                     </tr>
 
                 {% endfor %}
@@ -73,9 +118,12 @@
 
     {% else %}
 
-        <p>No events found.</p>
+        <p>
+            No events found.
+        </p>
 
     {% endif %}
 
 </body>
+
 </html>

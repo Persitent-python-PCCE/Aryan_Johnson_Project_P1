@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>
+        My Bookings
+    </title>
+
+</head>
+
+<body>
+
+    <h1>
+        My Bookings
+    </h1>
+
+
+    <p>
+
+        <a href="{{ url_for('customer.dashboard') }}">
+            ← Dashboard
+        </a>
+
+    </p>
+
+
+    {% with messages = get_flashed_messages(
+        with_categories=true
+    ) %}
+
+        {% if messages %}
+
+            {% for category, message in messages %}
+
+                <p>
+                    <strong>
+                        {{ category }}:
+                    </strong>
+
+                    {{ message }}
+                </p>
+
+            {% endfor %}
+
+        {% endif %}
+
+    {% endwith %}
+
+
+    {% if bookings %}
+
+        <table border="1" cellpadding="8">
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Reference
+                    </th>
+
+                    <th>
+                        Event
+                    </th>
+
+                    <th>
+                        Amount
+                    </th>
+
+                    <th>
+                        Status
+                    </th>
+
+                    <th>
+                        Created
+                    </th>
+
+                    <th>
+                        Action
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for booking in bookings %}
+
+                    <tr>
+
+                        <td>
+                            {{ booking.booking_reference }}
+                        </td>
+
+                        <td>
+                            {{ booking.event.name }}
+                        </td>
+
+                        <td>
+                            ₹{{ booking.total_amount }}
+                        </td>
+
+                        <td>
+                            {{ booking.status }}
+                        </td>
+
+                        <td>
+                            {{ booking.created_at }}
+                        </td>
+
+                        <td>
+
+                            <a
+                                href="{{ url_for(
+                                    'customer.booking_confirmation',
+                                    booking_id=booking.id
+                                ) }}"
+                            >
+                                View
+                            </a>
+
+
+                            {% if booking.status == "CONFIRMED" %}
+
+                                <form
+                                    method="POST"
+                                    action="{{ url_for(
+                                        'customer.cancel_booking',
+                                        booking_id=booking.id
+                                    ) }}"
+                                    style="display:inline;"
+                                >
+
+                                    <button
+                                        type="submit"
+                                    >
+                                        Cancel
+                                    </button>
+
+                                </form>
+
+                            {% endif %}
+
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    {% else %}
+
+        <p>
+            You have no bookings yet.
+        </p>
+
+        <a href="{{ url_for('customer.events') }}">
+            Browse Events
+        </a>
+
+    {% endif %}
+
+</body>
+
+</html>

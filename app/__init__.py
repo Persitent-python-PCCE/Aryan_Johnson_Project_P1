@@ -8,6 +8,7 @@ from app.controllers.main_controller import main_bp
 from app.controllers.auth_controller import auth_bp
 from app.controllers.customer_controller import customer_bp
 from app.controllers.admin_controller import admin_bp
+from app.controllers.customer_controller import customer_bp
 
 
 def create_app(test_config=None):
