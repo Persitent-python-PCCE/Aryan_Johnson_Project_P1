@@ -1,0 +1,12 @@
+from flask import Blueprint
+
+
+api_bp = Blueprint(
+    "api",
+    __name__,
+    url_prefix="/api/v1"
+)
+
+
+from app.controllers.api import health_api
+from app.controllers.api import event_api
