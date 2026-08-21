@@ -46,6 +46,10 @@
         {{ event.start_time }} - {{ event.end_time }}
     </p>
 
+    <h2>
+    <strong>{{ seats|length }} Seats Available</strong>
+    </h2>
+
 
     {% with messages = get_flashed_messages(
         with_categories=true

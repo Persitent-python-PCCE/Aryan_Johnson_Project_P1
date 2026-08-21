@@ -27,7 +27,10 @@ class BookingRepository:
 
     @staticmethod
     def get_by_id(booking_id):
-        return db.session.get(Booking, booking_id)
+        return db.session.get(
+            Booking,
+            booking_id
+        )
 
     @staticmethod
     def get_by_reference(booking_reference):
@@ -81,6 +84,7 @@ class BookingRepository:
 
     @staticmethod
     def search(
+        booking_reference=None,
         user_id=None,
         event_id=None,
         status=None,
@@ -88,6 +92,13 @@ class BookingRepository:
         per_page=10
     ):
         query = Booking.query
+
+        if booking_reference:
+            query = query.filter(
+                Booking.booking_reference.ilike(
+                    f"%{booking_reference}%"
+                )
+            )
 
         if user_id is not None:
             query = query.filter(
@@ -120,7 +131,11 @@ class BookingRepository:
     def update(booking, **kwargs):
         for field, value in kwargs.items():
             if hasattr(booking, field):
-                setattr(booking, field, value)
+                setattr(
+                    booking,
+                    field,
+                    value
+                )
 
         db.session.flush()
 

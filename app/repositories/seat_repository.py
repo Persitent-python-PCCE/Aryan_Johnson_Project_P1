@@ -106,3 +106,23 @@ class SeatRepository:
         .with_for_update()
         .first()
         )   
+
+
+    @staticmethod
+    def count_available_for_event(event_id):
+        available_seats = SeatRepository.get_available_for_event(
+            event_id
+        )
+
+        return len(available_seats)
+
+    @staticmethod
+    def count_by_venue(venue_id):
+        return (
+            Seat.query
+            .filter(
+                Seat.venue_id == venue_id,
+                Seat.is_active.is_(True)
+            )
+            .count()
+        )

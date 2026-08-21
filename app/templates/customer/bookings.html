@@ -75,7 +75,7 @@
                     </th>
 
                     <th>
-                        Created
+                        Booked At
                     </th>
 
                     <th>
@@ -110,7 +110,7 @@
                         </td>
 
                         <td>
-                            {{ booking.created_at }}
+                            {{ booking.booked_at.strftime("%Y-%m-%d %H:%M") }}
                         </td>
 
                         <td>

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Booking Details</title>
+</head>
+
+<body>
+
+    <h1>Booking Details</h1>
+
+    <p>
+        <a href="{{ url_for('admin.bookings') }}">
+            ← Back to Bookings
+        </a>
+    </p>
+
+    <hr>
+
+    <h2>
+        {{ booking.booking_reference }}
+    </h2>
+
+    <p>
+        <strong>Status:</strong>
+        {{ booking.status }}
+    </p>
+
+    <h3>Customer</h3>
+
+    <p>
+        <strong>Name:</strong>
+        {{ booking.user.name }}
+    </p>
+
+    <p>
+        <strong>Email:</strong>
+        {{ booking.user.email }}
+    </p>
+
+    <h3>Event</h3>
+
+    <p>
+        <strong>Name:</strong>
+        {{ booking.event.name }}
+    </p>
+
+    <p>
+        <strong>Date:</strong>
+        {{ booking.event.event_date }}
+    </p>
+
+    <p>
+        <strong>Time:</strong>
+        {{ booking.event.start_time }}
+        -
+        {{ booking.event.end_time }}
+    </p>
+
+    <h3>Seats</h3>
+
+    {% if booking.items %}
+
+        <table border="1" cellpadding="8">
+
+            <thead>
+                <tr>
+                    <th>Seat</th>
+                    <th>Type</th>
+                    <th>Price</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for item in booking.items %}
+
+                    <tr>
+
+                        <td>
+                            {{ item.seat.seat_number }}
+                        </td>
+
+                        <td>
+                            {{ item.seat.seat_type }}
+                        </td>
+
+                        <td>
+                            ₹{{ item.price }}
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    {% else %}
+
+        <p>
+            No booking items found.
+        </p>
+
+    {% endif %}
+
+    <h3>Payment Summary</h3>
+
+    <p>
+        <strong>Total Amount:</strong>
+        ₹{{ booking.total_amount }}
+    </p>
+
+    <h3>Booking Information</h3>
+
+    <p>
+        <strong>Booked At:</strong>
+
+        {{ booking.booked_at.strftime(
+            "%Y-%m-%d %H:%M"
+        ) }}
+    </p>
+
+    {% if booking.cancelled_at %}
+
+        <p>
+            <strong>Cancelled At:</strong>
+
+            {{ booking.cancelled_at.strftime(
+                "%Y-%m-%d %H:%M"
+            ) }}
+        </p>
+
+    {% endif %}
+
+    {% if booking.status == "CONFIRMED" %}
+
+        <hr>
+
+        <form
+            method="POST"
+            action="{{ url_for(
+                'admin.cancel_booking',
+                booking_id=booking.id
+            ) }}"
+        >
+
+            <button type="submit">
+                Cancel Booking
+            </button>
+
+        </form>
+
+    {% endif %}
+
+</body>
+
+</html>

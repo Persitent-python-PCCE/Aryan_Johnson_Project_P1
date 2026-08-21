@@ -160,6 +160,24 @@ class BookingService:
         )
 
     @staticmethod
+    def search_bookings(
+        booking_reference=None,
+        user_id=None,
+        event_id=None,
+        status=None,
+        page=1,
+        per_page=10
+    ):
+        return BookingRepository.search(
+            booking_reference=booking_reference,
+            user_id=user_id,
+            event_id=event_id,
+            status=status,
+            page=page,
+            per_page=per_page
+        )
+
+    @staticmethod
     def cancel_booking(booking_id):
         booking = BookingService.get_booking(
             booking_id

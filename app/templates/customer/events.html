@@ -157,6 +157,7 @@
                     <th>Start</th>
                     <th>End</th>
                     <th>Status</th>
+                    <th>Available Seats</th>
                     <th>Action</th>
                 </tr>
 
@@ -191,6 +192,22 @@
 
                         <td>
 
+                            {% if seat_summary[event.id]["total"] > 0 %}
+
+                                {{ seat_summary[event.id]["available"] }}
+                                /
+                                {{ seat_summary[event.id]["total"] }}
+
+                            {% else %}
+
+                                No seats configured
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+
                             <a
                                 href="{{ url_for(
                                     'customer.event_details',
@@ -198,6 +215,17 @@
                                 ) }}"
                             >
                                 View Details
+                            </a>
+
+                            |
+
+                            <a
+                                href="{{ url_for(
+                                    'customer.event_seats',
+                                    event_id=event.id
+                                ) }}"
+                            >
+                                View Seats
                             </a>
 
                         </td>

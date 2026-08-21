@@ -15,7 +15,6 @@ from app.services.category_service import CategoryService
 from app.services.venue_service import VenueService
 from app.services.seat_service import SeatService
 from app.services.booking_service import BookingService
-from app.services.seat_service import SeatService
 from app.utils.auth import role_required
 
 
@@ -105,6 +104,16 @@ def events():
 
     venues = VenueService.get_venues()
 
+    # Calculate seat availability for every event
+    seat_summary = {}
+
+    for event in events.items:
+        seat_summary[event.id] = (
+            SeatService.get_event_seat_summary(
+                event.id
+            )
+        )
+
     return render_template(
         "customer/events.html",
         events=events,
@@ -113,11 +122,14 @@ def events():
         keyword=keyword,
         selected_category=category_id,
         selected_venue=venue_id,
-        selected_date=event_date
+        selected_date=event_date,
+        seat_summary=seat_summary
     )
 
 
-@customer_bp.route("/events/<int:event_id>")
+@customer_bp.route(
+    "/events/<int:event_id>"
+)
 @role_required("CUSTOMER")
 def event_details(event_id):
 
@@ -130,38 +142,26 @@ def event_details(event_id):
         event=event
     )
 
-@customer_bp.route("/events/<int:event_id>/seats")
+
+@customer_bp.route(
+    "/events/<int:event_id>/seats"
+)
 @role_required("CUSTOMER")
 def event_seats(event_id):
 
-    event = EventService.get_event(event_id)
-
-    if not event:
-        return "Event not found", 404
+    event = EventService.get_event(
+        event_id
+    )
 
     if event.status != "PUBLISHED":
-        return "This event is not available for booking", 400
+        return (
+            "This event is not available for booking",
+            400
+        )
 
     seats = SeatService.get_available_seats(
         event_id
     )
-
-    return render_template(
-        "customer/event_seats.html",
-        event=event,
-        seats=seats
-    )
-
-@customer_bp.route("/events/<int:event_id>/seats")
-@role_required("CUSTOMER")
-def event_seats(event_id):
-
-    event = EventService.get_event(event_id)
-
-    if event.status != "PUBLISHED":
-        return "This event is not available for booking", 400
-
-    seats = SeatService.get_available_seats(event_id)
 
     return render_template(
         "customer/event_seats.html",
@@ -179,7 +179,9 @@ def book_event(event_id):
 
     user_id = session.get("user_id")
 
-    seat_ids = request.form.getlist("seat_ids")
+    seat_ids = request.form.getlist(
+        "seat_ids"
+    )
 
     try:
         seat_ids = [

@@ -142,3 +142,24 @@ class SeatService:
             seat,
             is_active=False
         )
+
+
+    @staticmethod
+    def get_event_seat_summary(event_id):
+        event = EventRepository.get_by_id(event_id)
+
+        if not event:
+            raise ValueError("Event not found")
+
+        total_seats = SeatRepository.count_by_venue(
+            event.venue_id
+        )
+
+        available_seats = SeatRepository.count_available_for_event(
+            event_id
+        )
+
+        return {
+            "total": total_seats,
+            "available": available_seats
+        }
