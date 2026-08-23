@@ -336,7 +336,7 @@ def admin_delete_category(category_id):
     "/admin/venues",
     methods=["GET"]
 )
-def amdin_get_venues():
+def admin_get_venues():
 
     auth_error = require_admin()
 
@@ -620,6 +620,18 @@ def admin_get_events():
         10,
         type=int
     )
+
+    if page < 1:
+        return jsonify({
+            "status": "error",
+            "message": "Page must be greater than zero"
+        }), 400
+
+    if per_page < 1 or per_page > 100:
+        return jsonify({
+            "status": "error",
+            "message": "per_page must be between 1 and 100"
+        }), 400
 
     keyword = request.args.get(
         "keyword"

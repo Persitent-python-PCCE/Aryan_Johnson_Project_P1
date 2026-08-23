@@ -972,3 +972,42 @@ def test_admin_cannot_delete_published_event(
     assert data["message"] == (
         "Published events cannot be deleted"
     )
+
+def test_admin_invalid_page_returns_400(
+    admin_client
+):
+    response = admin_client.get(
+        "/api/v1/admin/events",
+        query_string={
+            "page": 0
+        }
+    )
+
+    assert response.status_code == 400
+
+    data = response.get_json()
+
+    assert data["status"] == "error"
+    assert data["message"] == (
+        "Page must be greater than zero"
+    )
+
+
+def test_admin_invalid_per_page_returns_400(
+    admin_client
+):
+    response = admin_client.get(
+        "/api/v1/admin/events",
+        query_string={
+            "per_page": 101
+        }
+    )
+
+    assert response.status_code == 400
+
+    data = response.get_json()
+
+    assert data["status"] == "error"
+    assert data["message"] == (
+        "per_page must be between 1 and 100"
+    )

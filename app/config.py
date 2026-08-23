@@ -10,16 +10,16 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     UPLOAD_FOLDER = os.path.join(
-    os.getcwd(),
-    "uploads"
+        os.getcwd(),
+        "uploads"
     )
 
     POSTER_UPLOAD_FOLDER = os.path.join(
-    UPLOAD_FOLDER,
-    "posters"
+        UPLOAD_FOLDER,
+        "posters"
     )
 
     DOCUMENT_UPLOAD_FOLDER = os.path.join(
-    UPLOAD_FOLDER,
-    "documents"
+        UPLOAD_FOLDER,
+        "documents"
     )

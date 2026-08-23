@@ -286,6 +286,127 @@ def test_get_booking_details(
     )
 
 
+def test_customer_cannot_view_another_customers_booking(
+    authenticated_client,
+    app
+):
+
+    event_id, seat_ids = get_event_and_seats(app)
+
+    # Customer 1 creates the booking.
+    create_response = authenticated_client.post(
+        "/api/v1/bookings",
+        json={
+            "event_id": event_id,
+            "seat_ids": [seat_ids[0]]
+        }
+    )
+
+    assert create_response.status_code == 201
+
+    booking_id = (
+        create_response
+        .get_json()["data"]["id"]
+    )
+
+    # Create Customer 2.
+    with app.app_context():
+
+        second_customer = AuthService.register(
+            name="Second Booking Customer",
+            email="second-booking@example.com",
+            password="password123"
+        )
+
+        db.session.commit()
+
+        second_customer_id = second_customer.id
+
+    # Authenticate as Customer 2.
+    with authenticated_client.session_transaction() as session:
+        session["user_id"] = second_customer_id
+        session["role"] = "CUSTOMER"
+
+    # Customer 2 attempts to access Customer 1's booking.
+    response = authenticated_client.get(
+        f"/api/v1/bookings/{booking_id}"
+    )
+
+    assert response.status_code == 404
+
+    data = response.get_json()
+
+    assert data["status"] == "error"
+    assert data["message"] == "Booking not found"
+
+
+def test_customer_cannot_cancel_another_customers_booking(
+    authenticated_client,
+    app
+):
+
+    event_id, seat_ids = get_event_and_seats(app)
+
+    # Customer 1 creates the booking.
+    create_response = authenticated_client.post(
+        "/api/v1/bookings",
+        json={
+            "event_id": event_id,
+            "seat_ids": [seat_ids[0]]
+        }
+    )
+
+    assert create_response.status_code == 201
+
+    booking_id = (
+        create_response
+        .get_json()["data"]["id"]
+    )
+
+    # Create Customer 2.
+    with app.app_context():
+
+        second_customer = AuthService.register(
+            name="Second Booking Customer",
+            email="second-cancel@example.com",
+            password="password123"
+        )
+
+        db.session.commit()
+
+        second_customer_id = second_customer.id
+
+    # Authenticate as Customer 2.
+    with authenticated_client.session_transaction() as session:
+        session["user_id"] = second_customer_id
+        session["role"] = "CUSTOMER"
+
+    # Customer 2 attempts to cancel Customer 1's booking.
+    response = authenticated_client.post(
+        f"/api/v1/bookings/{booking_id}/cancel"
+    )
+
+    assert response.status_code == 404
+
+    data = response.get_json()
+
+    assert data["status"] == "error"
+    assert data["message"] == "Booking not found"
+
+    # Verify the original booking is still confirmed.
+    with app.app_context():
+
+        from app.models.booking import Booking
+
+        booking = db.session.get(
+            Booking,
+            booking_id
+        )
+
+        assert booking is not None
+        assert booking.status == "CONFIRMED"
+
+
 def test_cancel_booking(
     authenticated_client,
     app
@@ -473,4 +594,246 @@ def test_booking_unknown_event(
     assert (
         data["message"]
         == "Event not found"
+    )
+
+def test_seat_ids_must_be_a_list(
+    authenticated_client,
+    app
+):
+
+    event_id, seat_ids = get_event_and_seats(app)
+
+    response = authenticated_client.post(
+        "/api/v1/bookings",
+        json={
+            "event_id": event_id,
+            "seat_ids": seat_ids[0]
+        }
+    )
+
+    assert response.status_code == 400
+
+    data = response.get_json()
+
+    assert data["status"] == "error"
+    assert data["message"] == "seat_ids must be a list"
+
+
+def test_booking_unknown_seat(
+    authenticated_client,
+    app
+):
+
+    event_id, _ = get_event_and_seats(app)
+
+    response = authenticated_client.post(
+        "/api/v1/bookings",
+        json={
+            "event_id": event_id,
+            "seat_ids": [999999]
+        }
+    )
+
+    assert response.status_code == 400
+
+    data = response.get_json()
+
+    assert data["status"] == "error"
+    assert data["message"] == "Seat 999999 not found"
+
+
+def test_booking_inactive_seat(
+    authenticated_client,
+    app
+):
+
+    event_id, seat_ids = get_event_and_seats(app)
+
+    with app.app_context():
+
+        seat = db.session.get(
+            Seat,
+            seat_ids[0]
+        )
+
+        seat.is_active = False
+
+        db.session.commit()
+
+    response = authenticated_client.post(
+        "/api/v1/bookings",
+        json={
+            "event_id": event_id,
+            "seat_ids": [seat_ids[0]]
+        }
+    )
+
+    assert response.status_code == 400
+
+    data = response.get_json()
+
+    assert data["status"] == "error"
+    assert (
+        data["message"]
+        == f"Seat {seat_ids[0]} is inactive"
+    )
+
+
+def test_booking_seat_from_another_venue(
+    authenticated_client,
+    app
+):
+
+    event_id, _ = get_event_and_seats(app)
+
+    with app.app_context():
+
+        other_venue = Venue(
+            name="Other Venue",
+            address="Other Address",
+            city="Other City",
+            capacity=10
+        )
+
+        db.session.add(other_venue)
+        db.session.flush()
+
+        other_seat = Seat(
+            venue_id=other_venue.id,
+            seat_number="OTHER-S1",
+            row_number=1,
+            seat_type="REGULAR",
+            price=Decimal("500.00"),
+            is_active=True
+        )
+
+        db.session.add(other_seat)
+        db.session.commit()
+
+        other_seat_id = other_seat.id
+
+    response = authenticated_client.post(
+        "/api/v1/bookings",
+        json={
+            "event_id": event_id,
+            "seat_ids": [other_seat_id]
+        }
+    )
+
+    assert response.status_code == 400
+
+    data = response.get_json()
+
+    assert data["status"] == "error"
+    assert (
+        data["message"]
+        == f"Seat {other_seat_id} does not belong to the event venue"
+    )
+
+
+def test_already_booked_seat_cannot_be_booked_again(
+    authenticated_client,
+    app
+):
+
+    event_id, seat_ids = get_event_and_seats(app)
+
+    first_response = authenticated_client.post(
+        "/api/v1/bookings",
+        json={
+            "event_id": event_id,
+            "seat_ids": [seat_ids[0]]
+        }
+    )
+
+    assert first_response.status_code == 201
+
+    second_response = authenticated_client.post(
+        "/api/v1/bookings",
+        json={
+            "event_id": event_id,
+            "seat_ids": [seat_ids[0]]
+        }
+    )
+
+    assert second_response.status_code == 400
+
+    data = second_response.get_json()
+
+    assert data["status"] == "error"
+    assert (
+        data["message"]
+        == f"Seat {seat_ids[0]} is already booked"
+    )
+
+
+def test_duplicate_seat_ids_are_deduplicated(
+    authenticated_client,
+    app
+):
+
+    event_id, seat_ids = get_event_and_seats(app)
+
+    response = authenticated_client.post(
+        "/api/v1/bookings",
+        json={
+            "event_id": event_id,
+            "seat_ids": [
+                seat_ids[0],
+                seat_ids[0],
+                seat_ids[1]
+            ]
+        }
+    )
+
+    assert response.status_code == 201
+
+    data = response.get_json()
+
+    assert data["status"] == "success"
+
+    booking = data["data"]
+
+    assert len(booking["seats"]) == 2
+
+    assert (
+        booking["total_amount"]
+        == 3000.0
+    )
+
+
+def test_non_published_event_cannot_be_booked(
+    authenticated_client,
+    app
+):
+
+    event_id, seat_ids = get_event_and_seats(app)
+
+    with app.app_context():
+
+        event = db.session.get(
+            Event,
+            event_id
+        )
+
+        event.status = "DRAFT"
+
+        db.session.commit()
+
+    response = authenticated_client.post(
+        "/api/v1/bookings",
+        json={
+            "event_id": event_id,
+            "seat_ids": [seat_ids[0]]
+        }
+    )
+
+    assert response.status_code == 400
+
+    data = response.get_json()
+
+    assert data["status"] == "error"
+    assert (
+        data["message"]
+        == "Event is not available for booking"
     )
