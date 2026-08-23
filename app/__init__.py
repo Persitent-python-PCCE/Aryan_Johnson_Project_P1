@@ -12,9 +12,11 @@ from app.controllers.api import api_bp
 
 
 def create_app(test_config=None):
+
     load_dotenv()
 
     app = Flask(__name__)
+
     app.config.from_object(Config)
 
     if test_config:
