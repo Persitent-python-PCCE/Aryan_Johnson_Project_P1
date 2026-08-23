@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify, request
 from dotenv import load_dotenv
 
 from app.config import Config
@@ -31,4 +31,44 @@ def create_app(test_config=None):
     app.register_blueprint(admin_bp)
     app.register_blueprint(api_bp)
 
+    register_api_error_handlers(app)
+
     return app
+
+
+def register_api_error_handlers(app):
+
+    @app.errorhandler(404)
+    def handle_not_found(error):
+
+        if request.path.startswith("/api/v1"):
+            return jsonify({
+                "status": "error",
+                "message": "Resource not found"
+            }), 404
+
+        return error
+
+    @app.errorhandler(405)
+    def handle_method_not_allowed(error):
+
+        if request.path.startswith("/api/v1"):
+            return jsonify({
+                "status": "error",
+                "message": "Method not allowed"
+            }), 405
+
+        return error
+
+    @app.errorhandler(500)
+    def handle_internal_server_error(error):
+
+        if request.path.startswith("/api/v1"):
+            db.session.rollback()
+
+            return jsonify({
+                "status": "error",
+                "message": "Internal server error"
+            }), 500
+
+        return error

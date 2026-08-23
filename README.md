@@ -29,123 +29,158 @@ Repository Layer
 SQLAlchemy Models
        ↓
 MySQL Database
+```
 
-## 1. Clone the Repository
+## Setup and Installation
+
+### 1. Clone the Repository
+
 ```bash
 git clone https://github.com/Persitent-python-PCCE/Aryan_Johnson_Project_P1.git
-
-Move into the project directory:
-```bash
 cd Aryan_Johnson_Project_P1
+```
 
-## 2. Create a Virtual Environment
+### 2. Create a Virtual Environment
 
 Create a Python virtual environment:
 
 ```bash
 python -m venv venv
-Windows
+```
 
-Activate it using:
+#### Windows
+
+Activate the virtual environment:
+
 ```bash
 venv\Scripts\activate
-macOS / Linux
+```
+
+#### macOS / Linux
+
+```bash
 source venv/bin/activate
+```
 
 After activation, your terminal should show something similar to:
 
+```text
 (venv)
-3. Install Dependencies
+```
+
+### 3. Install Dependencies
 
 Install the required Python packages:
+
 ```bash
 pip install -r requirements.txt
-4. Configure MySQL
+```
+
+### 4. Configure MySQL
 
 Make sure MySQL Server is installed and running.
 
-Create a database for the application.
+Create a database for the application:
 
-For example:
-```bash
+```sql
 CREATE DATABASE ticket_booking;
+```
 
 You can use any database name you prefer.
 
-5. Configure Environment Variables
+### 5. Configure Environment Variables
 
-Create a file named:
-
-.env
-
-in the root directory of the project.
+Create a file named `.env` in the root directory of the project.
 
 Add:
-```bash
+
+```env
 SECRET_KEY=your-secret-key
 DATABASE_URL=mysql+pymysql://USERNAME:PASSWORD@localhost:3306/ticket_booking
+```
 
 Replace:
 
-USERNAME with your MySQL username
-PASSWORD with your MySQL password
-ticket_booking with your database name if you used a different name
+- `USERNAME` with your MySQL username
+- `PASSWORD` with your MySQL password
+- `ticket_booking` with your database name if you used a different name
 
 Example:
 
+```env
 SECRET_KEY=my-development-secret
 DATABASE_URL=mysql+pymysql://root:password@localhost:3306/ticket_booking
+```
 
-Do not commit the .env file to Git.
+**Do not commit the `.env` file to Git.**
 
-6. Initialize the Database
+### 6. Initialize the Database
 
 The project uses Flask-Migrate for database migrations.
 
 Run:
+
 ```bash
 flask db upgrade
+```
 
-This creates/updates the required database tables using the existing migration files.
+This creates and updates the required database tables using the existing migration files.
 
 If Flask cannot locate the application automatically, use:
+
 ```bash
 flask --app run.py db upgrade
-7. Run the Application
+```
+
+### 7. Run the Application
 
 Start the Flask application:
+
 ```bash
 python run.py
+```
 
-The application should start at:
-```bash
+The application will be available at:
+
+```text
 http://127.0.0.1:5000
+```
 
 Open the address in your browser.
 
-8. Test the Application
-Main Application
+## Testing the Application
+
+### Main Application
 
 Open:
-```bash
+
+```text
 http://127.0.0.1:5000
-Health Check
+```
+
+### Health Check
 
 Open:
-```bash
+
+```text
 http://127.0.0.1:5000/health
+```
 
 The application should return a successful health-check response.
 
-9. Testing the REST API
+## REST API
 
 The REST API uses the following base URL:
-```bash
+
+```text
 http://127.0.0.1:5000/api/v1
+```
 
-Examples:
+### Customer APIs
 
+```text
 GET  /api/v1/health
+
 POST /api/v1/auth/register
 POST /api/v1/auth/login
 POST /api/v1/auth/logout
@@ -158,46 +193,206 @@ POST /api/v1/bookings
 GET  /api/v1/bookings
 GET  /api/v1/bookings/<booking_id>
 POST /api/v1/bookings/<booking_id>/cancel
+```
+
+### Admin APIs
 
 Admin APIs are available under:
 
+```text
 /api/v1/admin/
+```
 
-For example:
+Examples:
 
+```text
 GET    /api/v1/admin/categories
 POST   /api/v1/admin/categories
+GET    /api/v1/admin/categories/<category_id>
+PUT    /api/v1/admin/categories/<category_id>
+DELETE /api/v1/admin/categories/<category_id>
 
 GET    /api/v1/admin/venues
 POST   /api/v1/admin/venues
+GET    /api/v1/admin/venues/<venue_id>
+PUT    /api/v1/admin/venues/<venue_id>
+DELETE /api/v1/admin/venues/<venue_id>
 
 GET    /api/v1/admin/events
 POST   /api/v1/admin/events
+GET    /api/v1/admin/events/<event_id>
+PUT    /api/v1/admin/events/<event_id>
+DELETE /api/v1/admin/events/<event_id>
+```
 
 The APIs return JSON responses and can be tested using Postman.
 
-10. Running Automated Tests
+## Automated Testing
 
 The project includes automated tests using Pytest.
 
 Make sure the virtual environment is activated, then run:
+
 ```bash
 python -m pytest -q
+```
 
-The project currently contains:
+The current test suite contains:
 
+```text
 158 passing tests
+```
 
-The tests cover areas including:
+The tests cover:
 
-Authentication
-Controllers
-Services
-Repositories
-REST APIs
-Admin APIs
-Booking operations
-Seat availability
-Authorization
-Validation
-Error handling
+- Authentication
+- Controllers
+- Services
+- Repositories
+- REST APIs
+- Admin APIs
+- Booking operations
+- Seat availability
+- Authorization
+- Input validation
+- Error handling
+
+## Recommended Booking API Workflow
+
+The complete customer booking workflow can be tested in the following order:
+
+```text
+Register Customer
+       ↓
+Login
+       ↓
+Browse Published Events
+       ↓
+View Event Details
+       ↓
+View Available Seats
+       ↓
+Create Booking
+       ↓
+View Booking
+       ↓
+Cancel Booking
+```
+
+## Recommended Admin API Workflow
+
+```text
+Login as Admin
+       ↓
+Manage Categories
+       ↓
+Manage Venues
+       ↓
+Create / Manage Events
+       ↓
+View Events
+       ↓
+Manage Bookings
+```
+
+## Project Structure
+
+```text
+Aryan_Johnson_Project_P1/
+│
+├── app/
+│   ├── controllers/
+│   │   ├── api/
+│   │   │   ├── admin_api.py
+│   │   │   ├── auth_api.py
+│   │   │   ├── booking_api.py
+│   │   │   ├── event_api.py
+│   │   │   ├── health_api.py
+│   │   │   └── seat_api.py
+│   │   │
+│   │   ├── admin_controller.py
+│   │   ├── auth_controller.py
+│   │   ├── customer_controller.py
+│   │   └── main_controller.py
+│   │
+│   ├── models/
+│   ├── repositories/
+│   ├── services/
+│   ├── config.py
+│   ├── extensions.py
+│   └── __init__.py
+│
+├── migrations/
+├── tests/
+├── .env
+├── .gitignore
+├── README.md
+├── requirements.txt
+└── run.py
+```
+
+## Troubleshooting
+
+### MySQL Connection Error
+
+Make sure:
+
+1. MySQL Server is running.
+2. The database exists.
+3. The username and password in `.env` are correct.
+4. `DATABASE_URL` contains the correct database name.
+
+Example:
+
+```env
+DATABASE_URL=mysql+pymysql://root:password@localhost:3306/ticket_booking
+```
+
+### `ModuleNotFoundError`
+
+Make sure the virtual environment is activated:
+
+```bash
+venv\Scripts\activate
+```
+
+Then install the dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+### Database Tables Are Missing
+
+Run:
+
+```bash
+flask db upgrade
+```
+
+### Port Already in Use
+
+Stop the existing Flask process or run the application on another available port.
+
+## Project Status
+
+The application currently includes:
+
+- Flask web application
+- Layered architecture
+- MySQL database integration
+- Authentication and session management
+- Role-based authorization
+- Customer booking workflow
+- Admin management functionality
+- REST API endpoints
+- JSON responses
+- Postman API testing
+- Automated Pytest test suite
+- Database migrations
+- Input validation
+- Seat availability protection
+- Booking cancellation
+- Booking ownership validation
+
+**Current automated test status: 158 tests passing.**
