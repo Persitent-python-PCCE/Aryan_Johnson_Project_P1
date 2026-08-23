@@ -1,53 +1,122 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
+{% block title %}
+    Customer Dashboard
+{% endblock %}
 
-    <meta charset="UTF-8">
+{% block content %}
 
-    <title>
-        Customer Dashboard
-    </title>
-
-</head>
-
-<body>
+<div class="page-header">
 
     <h1>
-        Customer Dashboard
+        Welcome Back
     </h1>
 
     <p>
-        Welcome to the Ticket Booking System.
+        Discover upcoming events and manage your bookings.
     </p>
 
+</div>
 
-    <p>
 
-        <a href="{{ url_for('customer.events') }}">
+<div class="dashboard-grid">
+
+    <div class="card stat-card">
+
+        <div class="stat-label">
+            Discover
+        </div>
+
+        <div class="stat-value">
+            Events
+        </div>
+
+        <p style="color: var(--text-light); margin-top: 8px;">
+            Explore upcoming events and find something you enjoy.
+        </p>
+
+    </div>
+
+
+    <div class="card stat-card">
+
+        <div class="stat-label">
+            Booking
+        </div>
+
+        <div class="stat-value">
+            Seats
+        </div>
+
+        <p style="color: var(--text-light); margin-top: 8px;">
+            Select available seats and reserve them instantly.
+        </p>
+
+    </div>
+
+
+    <div class="card stat-card">
+
+        <div class="stat-label">
+            Account
+        </div>
+
+        <div class="stat-value">
+            Tickets
+        </div>
+
+        <p style="color: var(--text-light); margin-top: 8px;">
+            View and manage all your bookings in one place.
+        </p>
+
+    </div>
+
+</div>
+
+
+<div class="dashboard-actions">
+
+    <div class="card action-card">
+
+        <h3>
             Browse Events
+        </h3>
+
+        <p>
+            Search and filter published events by category,
+            venue, or date.
+        </p>
+
+        <a
+            href="{{ url_for('customer.events') }}"
+            class="btn btn-primary"
+        >
+            Explore Events
         </a>
 
-    </p>
+    </div>
 
 
-    <p>
+    <div class="card action-card">
 
-        <a href="{{ url_for('customer.bookings') }}">
+        <h3>
             My Bookings
+        </h3>
+
+        <p>
+            View your booking history, ticket details,
+            and cancellation options.
+        </p>
+
+        <a
+            href="{{ url_for('customer.bookings') }}"
+            class="btn btn-secondary"
+        >
+            View Bookings
         </a>
 
-    </p>
+    </div>
 
+</div>
 
-    <p>
-
-        <a href="{{ url_for('auth.logout') }}">
-            Logout
-        </a>
-
-    </p>
-
-</body>
-
-</html>
+{% endblock %}

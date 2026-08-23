@@ -1,187 +1,189 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
+{% block title %}
+    Select Seats - {{ event.name }}
+{% endblock %}
 
-    <meta charset="UTF-8">
+{% block content %}
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
+<div class="page-header">
+
+    <a
+        href="{{ url_for(
+            'customer.event_details',
+            event_id=event.id
+        ) }}"
+        style="color: var(--primary); font-weight: 600;"
     >
+        ← Back to Event
+    </a>
 
-    <title>
-        Select Seats - {{ event.name }}
-    </title>
-
-</head>
-
-<body>
-
-    <p>
-
-        <a
-            href="{{ url_for(
-                'customer.event_details',
-                event_id=event.id
-            ) }}"
-        >
-            ← Back to Event
-        </a>
-
-    </p>
-
-
-    <h1>
-        Select Seats
+    <h1 style="margin-top: 15px;">
+        Select Your Seats
     </h1>
 
-    <h2>
-        {{ event.name }}
-    </h2>
-
     <p>
+        {{ event.name }}
+        ·
         {{ event.event_date }}
-        |
+        ·
         {{ event.start_time }} - {{ event.end_time }}
     </p>
 
-    <h2>
-    <strong>{{ seats|length }} Seats Available</strong>
-    </h2>
+</div>
 
 
-    {% with messages = get_flashed_messages(
-        with_categories=true
-    ) %}
+{% with messages = get_flashed_messages(with_categories=true) %}
 
-        {% if messages %}
+    {% if messages %}
 
-            {% for category, message in messages %}
+        {% for category, message in messages %}
 
-                <p>
-                    <strong>
-                        {{ category }}:
-                    </strong>
+            <div class="alert alert-{{ category }}">
+                {{ message }}
+            </div>
 
-                    {{ message }}
-                </p>
+        {% endfor %}
 
-            {% endfor %}
+    {% endif %}
 
-        {% endif %}
-
-    {% endwith %}
+{% endwith %}
 
 
-    {% if seats %}
+<div class="seat-layout">
 
-        <form
-            method="POST"
-            action="{{ url_for(
-                'customer.book_event',
-                event_id=event.id
-            ) }}"
-        >
+    <div class="card">
 
-            <table border="1" cellpadding="10">
+        <div class="card-body">
 
-                <thead>
-
-                    <tr>
-
-                        <th>
-                            Select
-                        </th>
-
-                        <th>
-                            Seat
-                        </th>
-
-                        <th>
-                            Row
-                        </th>
-
-                        <th>
-                            Type
-                        </th>
-
-                        <th>
-                            Price
-                        </th>
-
-                    </tr>
-
-                </thead>
+            <div class="stage">
+                STAGE
+            </div>
 
 
-                <tbody>
+            {% if seats %}
 
-                    {% for seat in seats %}
+                <form
+                    method="POST"
+                    action="{{ url_for(
+                        'customer.book_event',
+                        event_id=event.id
+                    ) }}"
+                >
 
-                        <tr>
+                    <div class="seat-grid">
 
-                            <td>
+                        {% for seat in seats %}
+
+                            <div class="seat">
 
                                 <input
                                     type="checkbox"
+                                    id="seat-{{ seat.id }}"
                                     name="seat_ids"
                                     value="{{ seat.id }}"
                                 >
 
-                            </td>
+                                <label for="seat-{{ seat.id }}">
 
-                            <td>
-                                {{ seat.seat_number }}
-                            </td>
+                                    <span>
 
-                            <td>
-                                {{ seat.row_number }}
-                            </td>
+                                        {{ seat.seat_number }}
 
-                            <td>
-                                {{ seat.seat_type }}
-                            </td>
+                                        <span class="seat-price">
+                                            ₹{{ seat.price }}
+                                        </span>
 
-                            <td>
-                                ₹{{ seat.price }}
-                            </td>
+                                    </span>
 
-                        </tr>
+                                </label>
 
-                    {% endfor %}
+                            </div>
 
-                </tbody>
+                        {% endfor %}
 
-            </table>
+                    </div>
 
 
-            <br>
+                    <div style="
+                        margin-top: 28px;
+                        padding: 16px;
+                        background: #f8fafc;
+                        border-radius: 8px;
+                        text-align: center;
+                    ">
+
+                        <p style="color: var(--text-light);">
+                            {{ seats|length }} seats currently available
+                        </p>
+
+                        <button
+                            type="submit"
+                            class="btn btn-primary"
+                            style="margin-top: 10px;"
+                        >
+                            Confirm Booking
+                        </button>
+
+                    </div>
+
+                </form>
+
+            {% else %}
+
+                <div class="empty-state">
+
+                    <h3>
+                        No Seats Available
+                    </h3>
+
+                    <p>
+                        There are currently no available seats
+                        for this event.
+                    </p>
+
+                    <div style="margin-top: 18px;">
+
+                        <a
+                            href="{{ url_for('customer.events') }}"
+                            class="btn btn-secondary"
+                        >
+                            Browse Other Events
+                        </a>
+
+                    </div>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
 
 
-            <button type="submit">
-                Confirm Booking
-            </button>
+    <div style="
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-top: 18px;
+        color: var(--text-light);
+        font-size: 13px;
+    ">
 
-        </form>
+        <span>
+            ▢ Available
+        </span>
 
-    {% else %}
+        <span>
+            <strong style="color: var(--primary);">
+                ▣
+            </strong>
+            Selected
+        </span>
 
-        <p>
-            No seats are currently available.
-        </p>
+    </div>
 
-    {% endif %}
+</div>
 
-
-    <p>
-
-        <a href="{{ url_for('customer.bookings') }}">
-            My Bookings
-        </a>
-
-    </p>
-
-</body>
-
-</html>
+{% endblock %}

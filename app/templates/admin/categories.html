@@ -1,68 +1,115 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% extends "base.html" %}
 
-    <title>Manage Categories</title>
-</head>
+{% block title %}
+    Categories
+{% endblock %}
 
-<body>
+{% block content %}
 
-    <h1>Manage Categories</h1>
+<div class="page-header page-header-row">
 
-    <p>
-        <a href="{{ url_for('admin.dashboard') }}">
-            ← Dashboard
-        </a>
-    </p>
+    <div>
 
-    <p>
-        <a href="{{ url_for('admin.create_category') }}">
-            + Create Category
-        </a>
-    </p>
+        <span class="eyebrow">
+            MANAGEMENT
+        </span>
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <p>
-                    <strong>{{ category }}:</strong>
-                    {{ message }}
-                </p>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
+        <h1>
+            Categories
+        </h1>
+
+        <p class="page-subtitle">
+            Organize events into categories.
+        </p>
+
+    </div>
+
+
+    <a
+        href="{{ url_for('admin.create_category') }}"
+        class="btn btn-primary"
+    >
+        + Create Category
+    </a>
+
+</div>
+
+
+<div class="admin-table-card">
 
     {% if categories %}
 
-        <table border="1" cellpadding="8">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Description</th>
-                </tr>
-            </thead>
+        <div class="table-wrapper">
 
-            <tbody>
-                {% for category in categories %}
+            <table class="data-table">
+
+                <thead>
+
                     <tr>
-                        <td>{{ category.id }}</td>
-                        <td>{{ category.name }}</td>
-                        <td>
-                            {{ category.description or "-" }}
-                        </td>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Description</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+
+                </thead>
+
+                <tbody>
+
+                    {% for category in categories %}
+
+                        <tr>
+
+                            <td class="table-id">
+                                #{{ category.id }}
+                            </td>
+
+                            <td>
+                                <strong>
+                                    {{ category.name }}
+                                </strong>
+                            </td>
+
+                            <td class="muted">
+                                {{ category.description or "-" }}
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
 
     {% else %}
 
-        <p>No categories found.</p>
+        <div class="empty-state">
+
+            <div class="empty-state-icon">
+                C
+            </div>
+
+            <h3>
+                No categories yet
+            </h3>
+
+            <p>
+                Create your first category to organize events.
+            </p>
+
+            <a
+                href="{{ url_for('admin.create_category') }}"
+                class="btn btn-primary"
+            >
+                Create Category
+            </a>
+
+        </div>
 
     {% endif %}
 
-</body>
-</html>
+</div>
+
+{% endblock %}

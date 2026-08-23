@@ -1,70 +1,118 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+{% extends "base.html" %}
 
-    <title>Login - Ticket Booking System</title>
-</head>
+{% block title %}
+    Login - Ticket Booking System
+{% endblock %}
 
-<body>
+{% block navbar %}
+{% endblock %}
 
-    <h1>Login</h1>
+{% block content %}
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="flash {{ category }}">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
+<div class="auth-wrapper">
 
-    <form method="POST">
+    <div class="card auth-card">
 
-        <div>
-            <label for="email">
-                Email
-            </label>
+        <div class="auth-header">
 
-            <input
-                type="email"
-                id="email"
-                name="email"
-                required
-                value="{{ request.form.get('email', '') }}"
-            >
+            <h1>Welcome Back</h1>
+
+            <p>
+                Sign in to continue to your account.
+            </p>
+
         </div>
 
-        <div>
-            <label for="password">
-                Password
-            </label>
 
-            <input
-                type="password"
-                id="password"
-                name="password"
-                required
-            >
+        {% with messages = get_flashed_messages(with_categories=true) %}
+
+            {% if messages %}
+
+                {% for category, message in messages %}
+
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+
+                {% endfor %}
+
+            {% endif %}
+
+        {% endwith %}
+
+
+        <form method="POST">
+
+            <div class="form-group">
+
+                <label for="email">
+                    Email Address
+                </label>
+
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    class="form-control"
+                    placeholder="Enter your email"
+                    required
+                    value="{{ request.form.get('email', '') }}"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="password">
+                    Password
+                </label>
+
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    class="form-control"
+                    placeholder="Enter your password"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-actions">
+
+                <button
+                    type="submit"
+                    class="btn btn-primary btn-block"
+                >
+                    Login
+                </button>
+
+            </div>
+
+        </form>
+
+
+        <div style="text-align: center; margin-top: 20px;">
+
+            <p style="color: var(--text-light);">
+
+                Don't have an account?
+
+                <a
+                    href="{{ url_for('auth.register') }}"
+                    style="color: var(--primary); font-weight: 600;"
+                >
+                    Create one
+                </a>
+
+            </p>
+
         </div>
 
-        <button type="submit">
-            Login
-        </button>
+    </div>
 
-    </form>
+</div>
 
-    <p>
-        Don't have an account?
-        <a href="{{ url_for('auth.register') }}">
-            Register
-        </a>
-    </p>
-
-</body>
-</html>
+{% endblock %}

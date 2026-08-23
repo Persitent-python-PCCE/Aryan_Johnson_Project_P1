@@ -1,60 +1,164 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
+{% extends "base.html" %}
+
+{% block title %}
+    Admin Dashboard
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <span class="eyebrow">ADMINISTRATION</span>
+
+        <h1>
+            Admin Dashboard
+        </h1>
+
+        <p class="page-subtitle">
+            Manage events, venues, categories and customer bookings
+            from one place.
+        </p>
+    </div>
+
+</div>
+
+
+<div class="admin-stat-grid">
+
+    <a
+        href="{{ url_for('admin.categories') }}"
+        class="admin-stat-card"
     >
 
-    <title>Admin Dashboard</title>
-</head>
+        <div class="admin-stat-icon">
+            C
+        </div>
 
-<body>
+        <div>
 
-    <h1>Admin Dashboard</h1>
+            <h3>
+                Categories
+            </h3>
 
-    <p>
-        Welcome to the Ticket Booking administration panel.
-    </p>
+            <p>
+                Manage event categories
+            </p>
 
-    <hr>
+        </div>
 
-    <h2>Management</h2>
+        <span class="admin-card-arrow">
+            →
+        </span>
 
-    <ul>
-
-        <li>
-            <a href="{{ url_for('admin.categories') }}">
-                Manage Categories
-            </a>
-        </li>
-
-        <li>
-            <a href="{{ url_for('admin.venues') }}">
-                Manage Venues
-            </a>
-        </li>
-
-        <li>
-            <a href="{{ url_for('admin.events') }}">
-                Manage Events
-            </a>
-        </li>
-
-        <li>
-            <a href="{{ url_for('admin.bookings') }}">
-                Manage Bookings
-            </a>
-        </li>
-
-    </ul>
-
-    <hr>
-
-    <a href="{{ url_for('auth.logout') }}">
-        Logout
     </a>
 
-</body>
-</html>
+
+    <a
+        href="{{ url_for('admin.venues') }}"
+        class="admin-stat-card"
+    >
+
+        <div class="admin-stat-icon">
+            V
+        </div>
+
+        <div>
+
+            <h3>
+                Venues
+            </h3>
+
+            <p>
+                Manage event locations
+            </p>
+
+        </div>
+
+        <span class="admin-card-arrow">
+            →
+        </span>
+
+    </a>
+
+
+    <a
+        href="{{ url_for('admin.events') }}"
+        class="admin-stat-card"
+    >
+
+        <div class="admin-stat-icon">
+            E
+        </div>
+
+        <div>
+
+            <h3>
+                Events
+            </h3>
+
+            <p>
+                Create and manage events
+            </p>
+
+        </div>
+
+        <span class="admin-card-arrow">
+            →
+        </span>
+
+    </a>
+
+
+    <a
+        href="{{ url_for('admin.bookings') }}"
+        class="admin-stat-card"
+    >
+
+        <div class="admin-stat-icon">
+            B
+        </div>
+
+        <div>
+
+            <h3>
+                Bookings
+            </h3>
+
+            <p>
+                Review customer bookings
+            </p>
+
+        </div>
+
+        <span class="admin-card-arrow">
+            →
+        </span>
+
+    </a>
+
+</div>
+
+
+<div class="admin-welcome-card">
+
+    <div>
+
+        <span class="eyebrow">
+            SYSTEM OVERVIEW
+        </span>
+
+        <h2>
+            Ticket Booking Administration
+        </h2>
+
+        <p>
+            Use the management sections above to maintain the
+            booking platform and monitor customer activity.
+        </p>
+
+    </div>
+
+</div>
+
+{% endblock %}

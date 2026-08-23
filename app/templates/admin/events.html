@@ -1,129 +1,227 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
+{% block title %}
+    Events
+{% endblock %}
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
+{% block content %}
+
+<div class="page-header page-header-row">
+
+    <div>
+
+        <span class="eyebrow">
+            MANAGEMENT
+        </span>
+
+        <h1>
+            Events
+        </h1>
+
+        <p class="page-subtitle">
+            Create and manage events available on the platform.
+        </p>
+
+    </div>
+
+
+    <a
+        href="{{ url_for('admin.create_event') }}"
+        class="btn btn-primary"
     >
+        + Create Event
+    </a>
 
-    <title>Manage Events</title>
-</head>
+</div>
 
-<body>
 
-    <h1>Manage Events</h1>
-
-    <p>
-        <a href="{{ url_for('admin.dashboard') }}">
-            ← Dashboard
-        </a>
-    </p>
-
-    <p>
-        <a href="{{ url_for('admin.create_event') }}">
-            + Create Event
-        </a>
-    </p>
-
-    {% with messages = get_flashed_messages(
-        with_categories=true
-    ) %}
-
-        {% if messages %}
-
-            {% for category, message in messages %}
-
-                <p>
-                    <strong>{{ category }}:</strong>
-                    {{ message }}
-                </p>
-
-            {% endfor %}
-
-        {% endif %}
-
-    {% endwith %}
-
+<div class="admin-table-card">
 
     {% if events.items %}
 
-        <table border="1" cellpadding="8">
+        <div class="table-wrapper">
 
-            <thead>
+            <table class="data-table">
 
-                <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Date</th>
-                    <th>Start Time</th>
-                    <th>End Time</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-
-            </thead>
-
-
-            <tbody>
-
-                {% for event in events.items %}
+                <thead>
 
                     <tr>
-
-                        <td>
-                            {{ event.id }}
-                        </td>
-
-                        <td>
-                            {{ event.name }}
-                        </td>
-
-                        <td>
-                            {{ event.event_date }}
-                        </td>
-
-                        <td>
-                            {{ event.start_time }}
-                        </td>
-
-                        <td>
-                            {{ event.end_time }}
-                        </td>
-
-                        <td>
-                            {{ event.status }}
-                        </td>
-
-                        <td>
-                            <a
-                                href="{{ url_for(
-                                    'admin.edit_event',
-                                    event_id=event.id
-                                ) }}"
-                            >
-                                Edit
-                            </a>
-                        </td>
-
+                        <th>Event</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Status</th>
+                        <th>Action</th>
                     </tr>
 
-                {% endfor %}
+                </thead>
 
-            </tbody>
+                <tbody>
 
-        </table>
+                    {% for event in events.items %}
+
+                        <tr>
+
+                            <td>
+
+                                <strong>
+                                    {{ event.name }}
+                                </strong>
+
+                                <span class="table-secondary">
+                                    Event #{{ event.id }}
+                                </span>
+
+                            </td>
+
+
+                            <td>
+                                {{ event.event_date }}
+                            </td>
+
+
+                            <td>
+
+                                {{ event.start_time }}
+
+                                <span class="table-secondary">
+                                    to {{ event.end_time }}
+                                </span>
+
+                            </td>
+
+
+                            <td>
+
+                                {% if event.status == "PUBLISHED" %}
+
+                                    <span class="status-badge status-success">
+                                        Published
+                                    </span>
+
+                                {% elif event.status == "DRAFT" %}
+
+                                    <span class="status-badge status-warning">
+                                        Draft
+                                    </span>
+
+                                {% elif event.status == "CANCELLED" %}
+
+                                    <span class="status-badge status-danger">
+                                        Cancelled
+                                    </span>
+
+                                {% elif event.status == "COMPLETED" %}
+
+                                    <span class="status-badge status-neutral">
+                                        Completed
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="status-badge status-neutral">
+                                        {{ event.status }}
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+
+                                <a
+                                    href="{{ url_for(
+                                        'admin.edit_event',
+                                        event_id=event.id
+                                    ) }}"
+                                    class="table-action"
+                                >
+                                    Edit
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        {% if events.pages > 1 %}
+
+            <div class="pagination">
+
+                {% if events.has_prev %}
+
+                    <a
+                        href="{{ url_for(
+                            'admin.events',
+                            page=events.prev_num
+                        ) }}"
+                        class="pagination-link"
+                    >
+                        ← Previous
+                    </a>
+
+                {% endif %}
+
+
+                <span class="pagination-current">
+                    Page {{ events.page }} of {{ events.pages }}
+                </span>
+
+
+                {% if events.has_next %}
+
+                    <a
+                        href="{{ url_for(
+                            'admin.events',
+                            page=events.next_num
+                        ) }}"
+                        class="pagination-link"
+                    >
+                        Next →
+                    </a>
+
+                {% endif %}
+
+            </div>
+
+        {% endif %}
 
     {% else %}
 
-        <p>
-            No events found.
-        </p>
+        <div class="empty-state">
+
+            <div class="empty-state-icon">
+                E
+            </div>
+
+            <h3>
+                No events found
+            </h3>
+
+            <p>
+                Create your first event to make it available
+                to customers.
+            </p>
+
+            <a
+                href="{{ url_for('admin.create_event') }}"
+                class="btn btn-primary"
+            >
+                Create Event
+            </a>
+
+        </div>
 
     {% endif %}
 
-</body>
+</div>
 
-</html>
+{% endblock %}

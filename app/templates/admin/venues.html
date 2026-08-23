@@ -1,72 +1,134 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% extends "base.html" %}
 
-    <title>Manage Venues</title>
-</head>
+{% block title %}
+    Venues
+{% endblock %}
 
-<body>
+{% block content %}
 
-    <h1>Manage Venues</h1>
+<div class="page-header page-header-row">
 
-    <p>
-        <a href="{{ url_for('admin.dashboard') }}">
-            ← Dashboard
-        </a>
-    </p>
+    <div>
 
-    <p>
-        <a href="{{ url_for('admin.create_venue') }}">
-            + Create Venue
-        </a>
-    </p>
+        <span class="eyebrow">
+            MANAGEMENT
+        </span>
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <p>
-                    <strong>{{ category }}:</strong>
-                    {{ message }}
-                </p>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
+        <h1>
+            Venues
+        </h1>
+
+        <p class="page-subtitle">
+            Manage locations where events are hosted.
+        </p>
+
+    </div>
+
+
+    <a
+        href="{{ url_for('admin.create_venue') }}"
+        class="btn btn-primary"
+    >
+        + Create Venue
+    </a>
+
+</div>
+
+
+<div class="admin-table-card">
 
     {% if venues %}
 
-        <table border="1" cellpadding="8">
+        <div class="table-wrapper">
 
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Address</th>
-                    <th>City</th>
-                    <th>Capacity</th>
-                </tr>
-            </thead>
+            <table class="data-table">
 
-            <tbody>
-                {% for venue in venues %}
+                <thead>
+
                     <tr>
-                        <td>{{ venue.id }}</td>
-                        <td>{{ venue.name }}</td>
-                        <td>{{ venue.address }}</td>
-                        <td>{{ venue.city }}</td>
-                        <td>{{ venue.capacity }}</td>
+                        <th>ID</th>
+                        <th>Venue</th>
+                        <th>Location</th>
+                        <th>Capacity</th>
                     </tr>
-                {% endfor %}
-            </tbody>
 
-        </table>
+                </thead>
+
+                <tbody>
+
+                    {% for venue in venues %}
+
+                        <tr>
+
+                            <td class="table-id">
+                                #{{ venue.id }}
+                            </td>
+
+                            <td>
+
+                                <strong>
+                                    {{ venue.name }}
+                                </strong>
+
+                            </td>
+
+                            <td>
+
+                                <div>
+                                    {{ venue.address }}
+                                </div>
+
+                                <span class="table-secondary">
+                                    {{ venue.city }}
+                                </span>
+
+                            </td>
+
+                            <td>
+
+                                <span class="capacity-badge">
+                                    {{ venue.capacity }} seats
+                                </span>
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
 
     {% else %}
 
-        <p>No venues found.</p>
+        <div class="empty-state">
+
+            <div class="empty-state-icon">
+                V
+            </div>
+
+            <h3>
+                No venues yet
+            </h3>
+
+            <p>
+                Add a venue before creating events.
+            </p>
+
+            <a
+                href="{{ url_for('admin.create_venue') }}"
+                class="btn btn-primary"
+            >
+                Create Venue
+            </a>
+
+        </div>
 
     {% endif %}
 
-</body>
-</html>
+</div>
+
+{% endblock %}

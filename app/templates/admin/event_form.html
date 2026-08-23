@@ -1,166 +1,264 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-    <title>Create Event</title>
-</head>
+{% extends "base.html" %}
 
-<body>
+{% block title %}
+    Create Event
+{% endblock %}
 
-    <h1>Create Event</h1>
+{% block content %}
 
-    <p>
-        <a href="{{ url_for('admin.events') }}">
-            ← Back to Events
-        </a>
-    </p>
+<div class="form-page">
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <p>
-                    <strong>{{ category }}:</strong>
-                    {{ message }}
-                </p>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
+    <div class="page-header">
 
-    <form method="POST">
+        <span class="eyebrow">
+            EVENT MANAGEMENT
+        </span>
 
-        <p>
-            <label for="name">Event Name:</label><br>
-            <input
-                type="text"
-                id="name"
-                name="name"
-                required
-            >
-        </p>
-
-        <p>
-            <label for="description">Description:</label><br>
-            <textarea
-                id="description"
-                name="description"
-                rows="5"
-                cols="40"
-            ></textarea>
-        </p>
-
-        <p>
-            <label for="category_id">Category:</label><br>
-
-            <select
-                id="category_id"
-                name="category_id"
-                required
-            >
-
-                <option value="">
-                    -- Select Category --
-                </option>
-
-                {% for category in categories %}
-                    <option value="{{ category.id }}">
-                        {{ category.name }}
-                    </option>
-                {% endfor %}
-
-            </select>
-        </p>
-
-        <p>
-            <label for="venue_id">Venue:</label><br>
-
-            <select
-                id="venue_id"
-                name="venue_id"
-                required
-            >
-
-                <option value="">
-                    -- Select Venue --
-                </option>
-
-                {% for venue in venues %}
-                    <option value="{{ venue.id }}">
-                        {{ venue.name }} - {{ venue.city }}
-                    </option>
-                {% endfor %}
-
-            </select>
-        </p>
-
-        <p>
-            <label for="event_date">Event Date:</label><br>
-
-            <input
-                type="date"
-                id="event_date"
-                name="event_date"
-                required
-            >
-        </p>
-
-        <p>
-            <label for="start_time">Start Time:</label><br>
-
-            <input
-                type="time"
-                id="start_time"
-                name="start_time"
-                required
-            >
-        </p>
-
-        <p>
-            <label for="end_time">End Time:</label><br>
-
-            <input
-                type="time"
-                id="end_time"
-                name="end_time"
-                required
-            >
-        </p>
-
-        <p>
-            <label for="status">Status:</label><br>
-
-            <select
-                id="status"
-                name="status"
-            >
-
-                <option value="DRAFT">
-                    Draft
-                </option>
-
-                <option value="PUBLISHED">
-                    Published
-                </option>
-
-                <option value="CANCELLED">
-                    Cancelled
-                </option>
-
-                <option value="COMPLETED">
-                    Completed
-                </option>
-
-            </select>
-        </p>
-
-        <button type="submit">
+        <h1>
             Create Event
-        </button>
+        </h1>
 
-    </form>
+        <p class="page-subtitle">
+            Create an event and configure when and where it will take place.
+        </p>
 
-</body>
-</html>
+    </div>
+
+
+    <div class="form-card">
+
+        <form
+            method="POST"
+            action="{{ url_for('admin.create_event') }}"
+        >
+
+            <div class="form-section">
+
+                <div class="form-section-title">
+                    Basic Information
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="name">
+                        Event Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        required
+                        placeholder="e.g. Live Music Festival"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="description">
+                        Description
+                    </label>
+
+                    <textarea
+                        id="description"
+                        name="description"
+                        rows="5"
+                        placeholder="Describe the event..."
+                    ></textarea>
+
+                </div>
+
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+
+                        <label for="category_id">
+                            Category
+                        </label>
+
+                        <select
+                            id="category_id"
+                            name="category_id"
+                            required
+                        >
+
+                            <option value="">
+                                Select category
+                            </option>
+
+                            {% for category in categories %}
+
+                                <option
+                                    value="{{ category.id }}"
+                                >
+                                    {{ category.name }}
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="venue_id">
+                            Venue
+                        </label>
+
+                        <select
+                            id="venue_id"
+                            name="venue_id"
+                            required
+                        >
+
+                            <option value="">
+                                Select venue
+                            </option>
+
+                            {% for venue in venues %}
+
+                                <option
+                                    value="{{ venue.id }}"
+                                >
+                                    {{ venue.name }} — {{ venue.city }}
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="form-section">
+
+                <div class="form-section-title">
+                    Schedule
+                </div>
+
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+
+                        <label for="event_date">
+                            Event Date
+                        </label>
+
+                        <input
+                            type="date"
+                            id="event_date"
+                            name="event_date"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="status">
+                            Status
+                        </label>
+
+                        <select
+                            id="status"
+                            name="status"
+                        >
+
+                            <option value="DRAFT">
+                                Draft
+                            </option>
+
+                            <option value="PUBLISHED">
+                                Published
+                            </option>
+
+                            <option value="CANCELLED">
+                                Cancelled
+                            </option>
+
+                            <option value="COMPLETED">
+                                Completed
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+
+                        <label for="start_time">
+                            Start Time
+                        </label>
+
+                        <input
+                            type="time"
+                            id="start_time"
+                            name="start_time"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="end_time">
+                            End Time
+                        </label>
+
+                        <input
+                            type="time"
+                            id="end_time"
+                            name="end_time"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="form-actions">
+
+                <a
+                    href="{{ url_for('admin.events') }}"
+                    class="btn btn-secondary"
+                >
+                    Cancel
+                </a>
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                >
+                    Create Event
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

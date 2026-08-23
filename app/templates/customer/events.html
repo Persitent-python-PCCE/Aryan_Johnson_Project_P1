@@ -1,202 +1,224 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
+{% block title %}
+    Browse Events
+{% endblock %}
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+{% block content %}
 
-    <title>Browse Events</title>
-</head>
+<div class="page-header">
 
-<body>
-
-    <h1>Browse Events</h1>
+    <h1>
+        Browse Events
+    </h1>
 
     <p>
-        <a href="{{ url_for('customer.dashboard') }}">
-            ← Dashboard
-        </a>
+        Find an event and reserve your seats.
     </p>
 
+</div>
 
-    <!-- Search and Filters -->
+
+<div class="card filter-card">
 
     <form
         method="GET"
         action="{{ url_for('customer.events') }}"
     >
 
-        <p>
+        <div class="filter-grid">
 
-            <label for="keyword">
-                Search:
-            </label>
+            <div class="form-group">
 
-            <input
-                type="text"
-                id="keyword"
-                name="keyword"
-                value="{{ keyword }}"
-                placeholder="Search events"
-            >
+                <label for="keyword">
+                    Search
+                </label>
 
-        </p>
+                <input
+                    class="form-control"
+                    type="text"
+                    id="keyword"
+                    name="keyword"
+                    value="{{ keyword }}"
+                    placeholder="Search event name..."
+                >
+
+            </div>
 
 
-        <p>
+            <div class="form-group">
 
-            <label for="category_id">
-                Category:
-            </label>
+                <label for="category_id">
+                    Category
+                </label>
 
-            <select
-                id="category_id"
-                name="category_id"
-            >
+                <select
+                    class="form-control"
+                    id="category_id"
+                    name="category_id"
+                >
 
-                <option value="">
-                    All Categories
-                </option>
-
-                {% for category in categories %}
-
-                    <option
-                        value="{{ category.id }}"
-                        {% if selected_category == category.id %}
-                            selected
-                        {% endif %}
-                    >
-                        {{ category.name }}
+                    <option value="">
+                        All Categories
                     </option>
 
-                {% endfor %}
+                    {% for category in categories %}
 
-            </select>
+                        <option
+                            value="{{ category.id }}"
+                            {% if selected_category == category.id %}
+                                selected
+                            {% endif %}
+                        >
+                            {{ category.name }}
+                        </option>
 
-        </p>
+                    {% endfor %}
+
+                </select>
+
+            </div>
 
 
-        <p>
+            <div class="form-group">
 
-            <label for="venue_id">
-                Venue:
-            </label>
+                <label for="venue_id">
+                    Venue
+                </label>
 
-            <select
-                id="venue_id"
-                name="venue_id"
-            >
+                <select
+                    class="form-control"
+                    id="venue_id"
+                    name="venue_id"
+                >
 
-                <option value="">
-                    All Venues
-                </option>
-
-                {% for venue in venues %}
-
-                    <option
-                        value="{{ venue.id }}"
-                        {% if selected_venue == venue.id %}
-                            selected
-                        {% endif %}
-                    >
-                        {{ venue.name }} - {{ venue.city }}
+                    <option value="">
+                        All Venues
                     </option>
 
-                {% endfor %}
+                    {% for venue in venues %}
 
-            </select>
+                        <option
+                            value="{{ venue.id }}"
+                            {% if selected_venue == venue.id %}
+                                selected
+                            {% endif %}
+                        >
+                            {{ venue.name }}
+                        </option>
 
-        </p>
+                    {% endfor %}
 
+                </select>
 
-        <p>
-
-            <label for="event_date">
-                Date:
-            </label>
-
-            <input
-                type="date"
-                id="event_date"
-                name="event_date"
-                value="{{ selected_date }}"
-            >
-
-        </p>
+            </div>
 
 
-        <button type="submit">
-            Search
-        </button>
+            <div class="form-group">
 
-        <a href="{{ url_for('customer.events') }}">
-            Clear Filters
-        </a>
+                <label for="event_date">
+                    Date
+                </label>
+
+                <input
+                    class="form-control"
+                    type="date"
+                    id="event_date"
+                    name="event_date"
+                    value="{{ selected_date }}"
+                >
+
+            </div>
+
+
+            <div>
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                >
+                    Search
+                </button>
+
+                <a
+                    href="{{ url_for('customer.events') }}"
+                    class="btn btn-secondary"
+                >
+                    Clear
+                </a>
+
+            </div>
+
+        </div>
 
     </form>
 
-
-    <hr>
-
-
-    {% if events.items %}
-
-        <h2>Published Events</h2>
-
-        <table border="1" cellpadding="8">
-
-            <thead>
-
-                <tr>
-                    <th>Name</th>
-                    <th>Date</th>
-                    <th>Start</th>
-                    <th>End</th>
-                    <th>Status</th>
-                    <th>Available Seats</th>
-                    <th>Action</th>
-                </tr>
-
-            </thead>
+</div>
 
 
-            <tbody>
+{% if events.items %}
 
-                {% for event in events.items %}
+    <div class="event-grid">
 
-                    <tr>
+        {% for event in events.items %}
 
-                        <td>
-                            {{ event.name }}
-                        </td>
+            <article class="card event-card">
 
-                        <td>
-                            {{ event.event_date }}
-                        </td>
+                <div class="event-card-top">
 
-                        <td>
-                            {{ event.start_time }}
-                        </td>
+                    <h3>
+                        {{ event.name }}
+                    </h3>
 
-                        <td>
-                            {{ event.end_time }}
-                        </td>
+                    <span>
+                        {{ event.category.name }}
+                    </span>
 
-                        <td>
-                            {{ event.status }}
-                        </td>
+                </div>
 
-                        <td>
+
+                <div class="event-card-body">
+
+                    {% if event.description %}
+
+                        <p class="event-description">
+
+                            {{ event.description }}
+
+                        </p>
+
+                    {% endif %}
+
+
+                    <div class="event-meta">
+
+                        <div>
+                            📅
+                            {{ event.event_date.strftime("%d %b %Y") }}
+                        </div>
+
+                        <div>
+                            🕐
+                            {{ event.start_time.strftime("%H:%M") }}
+                            -
+                            {{ event.end_time.strftime("%H:%M") }}
+                        </div>
+
+                        <div>
+                            📍
+                            {{ event.venue.name }},
+                            {{ event.venue.city }}
+                        </div>
+
+                        <div>
 
                             {% if seat_summary[event.id]["total"] > 0 %}
 
+                                🎟
                                 {{ seat_summary[event.id]["available"] }}
                                 /
                                 {{ seat_summary[event.id]["total"] }}
+                                seats available
 
                             {% else %}
 
@@ -204,94 +226,111 @@
 
                             {% endif %}
 
-                        </td>
+                        </div>
 
-                        <td>
-
-                            <a
-                                href="{{ url_for(
-                                    'customer.event_details',
-                                    event_id=event.id
-                                ) }}"
-                            >
-                                View Details
-                            </a>
-
-                            |
-
-                            <a
-                                href="{{ url_for(
-                                    'customer.event_seats',
-                                    event_id=event.id
-                                ) }}"
-                            >
-                                View Seats
-                            </a>
-
-                        </td>
-
-                    </tr>
-
-                {% endfor %}
-
-            </tbody>
-
-        </table>
+                    </div>
 
 
-        <!-- Pagination -->
+                    <div class="event-actions">
 
-        <p>
+                        <a
+                            href="{{ url_for(
+                                'customer.event_details',
+                                event_id=event.id
+                            ) }}"
+                            class="btn btn-secondary btn-small"
+                        >
+                            Details
+                        </a>
 
-            {% if events.has_prev %}
+                        <a
+                            href="{{ url_for(
+                                'customer.event_seats',
+                                event_id=event.id
+                            ) }}"
+                            class="btn btn-primary btn-small"
+                        >
+                            Select Seats
+                        </a>
 
-                <a
-                    href="{{ url_for(
-                        'customer.events',
-                        page=events.prev_num,
-                        keyword=keyword,
-                        category_id=selected_category,
-                        venue_id=selected_venue,
-                        event_date=selected_date
-                    ) }}"
-                >
-                    ← Previous
-                </a>
+                    </div>
 
-            {% endif %}
+                </div>
 
+            </article>
+
+        {% endfor %}
+
+    </div>
+
+
+    <div class="pagination">
+
+        {% if events.has_prev %}
+
+            <a
+                class="btn btn-secondary btn-small"
+                href="{{ url_for(
+                    'customer.events',
+                    page=events.prev_num,
+                    keyword=keyword,
+                    category_id=selected_category,
+                    venue_id=selected_venue,
+                    event_date=selected_date
+                ) }}"
+            >
+                ← Previous
+            </a>
+
+        {% endif %}
+
+
+        <span class="pagination-info">
 
             Page {{ events.page }}
             of {{ events.pages }}
 
+        </span>
 
-            {% if events.has_next %}
 
-                <a
-                    href="{{ url_for(
-                        'customer.events',
-                        page=events.next_num,
-                        keyword=keyword,
-                        category_id=selected_category,
-                        venue_id=selected_venue,
-                        event_date=selected_date
-                    ) }}"
-                >
-                    Next →
-                </a>
+        {% if events.has_next %}
 
-            {% endif %}
+            <a
+                class="btn btn-secondary btn-small"
+                href="{{ url_for(
+                    'customer.events',
+                    page=events.next_num,
+                    keyword=keyword,
+                    category_id=selected_category,
+                    venue_id=selected_venue,
+                    event_date=selected_date
+                ) }}"
+            >
+                Next →
+            </a>
 
-        </p>
+        {% endif %}
 
-    {% else %}
+    </div>
 
-        <p>
-            No published events found.
-        </p>
+{% else %}
 
-    {% endif %}
+    <div class="card">
 
-</body>
+        <div class="empty-state">
 
-</html>
+            <h3>
+                No events found
+            </h3>
+
+            <p>
+                Try changing your search or filters.
+            </p>
+
+        </div>
+
+    </div>
+
+{% endif %}
+
+{% endblock %}

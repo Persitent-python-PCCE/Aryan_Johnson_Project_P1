@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        {% block title %}
+            Ticket Booking System
+        {% endblock %}
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+</head>
+
+<body>
+
+    {% block navbar %}
+
+        <nav class="navbar">
+
+            <div class="container navbar-inner">
+
+                <a
+                    href="{{ url_for('main.index') }}"
+                    class="brand"
+                >
+                    <span class="brand-mark">T</span>
+                    <span>Ticket Booking</span>
+                </a>
+
+                <div class="nav-links">
+
+                    {% if session.get("role") == "CUSTOMER" %}
+
+                        <a href="{{ url_for('customer.dashboard') }}">
+                            Dashboard
+                        </a>
+
+                        <a href="{{ url_for('customer.events') }}">
+                            Events
+                        </a>
+
+                        <a href="{{ url_for('customer.bookings') }}">
+                            My Bookings
+                        </a>
+
+                        <a href="{{ url_for('auth.logout') }}">
+                            Logout
+                        </a>
+
+                    {% elif session.get("role") == "ADMIN" %}
+
+                        <a href="{{ url_for('admin.dashboard') }}">
+                            Dashboard
+                        </a>
+
+                        <a href="{{ url_for('admin.categories') }}">
+                            Categories
+                        </a>
+
+                        <a href="{{ url_for('admin.venues') }}">
+                            Venues
+                        </a>
+
+                        <a href="{{ url_for('admin.events') }}">
+                            Events
+                        </a>
+
+                        <a href="{{ url_for('admin.bookings') }}">
+                            Bookings
+                        </a>
+
+                        <a href="{{ url_for('auth.logout') }}">
+                            Logout
+                        </a>
+
+                    {% else %}
+
+                        <a href="{{ url_for('auth.login') }}">
+                            Login
+                        </a>
+
+                        <a href="{{ url_for('auth.register') }}">
+                            Register
+                        </a>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </nav>
+
+    {% endblock %}
+
+
+    <main>
+
+        <div class="container page">
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+
+                {% if messages %}
+
+                    {% for category, message in messages %}
+
+                        <div class="alert alert-{{ category }}">
+                            {{ message }}
+                        </div>
+
+                    {% endfor %}
+
+                {% endif %}
+
+            {% endwith %}
+
+
+            {% block content %}
+            {% endblock %}
+
+        </div>
+
+    </main>
+
+
+    <footer class="footer">
+
+        <div class="container">
+
+            Online Ticket Booking System
+            · Flask REST API
+            · {{ current_year if current_year else "" }}
+
+        </div>
+
+    </footer>
+
+</body>
+
+</html>

@@ -1,249 +1,269 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
+{% block title %}
+    Edit Event
+{% endblock %}
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+{% block content %}
 
-    <title>Edit Event</title>
-</head>
+<div class="form-page">
 
-<body>
+    <div class="page-header">
 
-    <h1>Edit Event</h1>
+        <span class="eyebrow">
+            EVENT MANAGEMENT
+        </span>
 
-    <p>
-        <a href="{{ url_for('admin.events') }}">
-            ← Back to Events
-        </a>
-    </p>
+        <h1>
+            Edit Event
+        </h1>
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-
-        {% if messages %}
-
-            {% for category, message in messages %}
-
-                <p>
-                    <strong>{{ category }}:</strong>
-                    {{ message }}
-                </p>
-
-            {% endfor %}
-
-        {% endif %}
-
-    {% endwith %}
-
-
-    <form method="POST">
-
-        <p>
-            <label for="name">
-                Event Name
-            </label>
-
-            <br>
-
-            <input
-                type="text"
-                id="name"
-                name="name"
-                value="{{ event.name }}"
-                required
-            >
+        <p class="page-subtitle">
+            Update the details and schedule for this event.
         </p>
 
-
-        <p>
-            <label for="description">
-                Description
-            </label>
-
-            <br>
-
-            <textarea
-                id="description"
-                name="description"
-                rows="5"
-                cols="40"
-            >{{ event.description or "" }}</textarea>
-        </p>
+    </div>
 
 
-        <p>
-            <label for="category_id">
-                Category
-            </label>
+    <div class="form-card">
 
-            <br>
+        <form
+            method="POST"
+            action="{{ url_for(
+                'admin.edit_event',
+                event_id=event.id
+            ) }}"
+        >
 
-            <select
-                id="category_id"
-                name="category_id"
-                required
-            >
+            <div class="form-section">
 
-                {% for category in categories %}
+                <div class="form-section-title">
+                    Basic Information
+                </div>
 
-                    <option
-                        value="{{ category.id }}"
-                        {% if category.id == event.category_id %}
-                            selected
-                        {% endif %}
+
+                <div class="form-group">
+
+                    <label for="name">
+                        Event Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        value="{{ event.name }}"
+                        required
                     >
-                        {{ category.name }}
-                    </option>
 
-                {% endfor %}
-
-            </select>
-        </p>
+                </div>
 
 
-        <p>
-            <label for="venue_id">
-                Venue
-            </label>
+                <div class="form-group">
 
-            <br>
+                    <label for="description">
+                        Description
+                    </label>
 
-            <select
-                id="venue_id"
-                name="venue_id"
-                required
-            >
+                    <textarea
+                        id="description"
+                        name="description"
+                        rows="5"
+                    >{{ event.description or "" }}</textarea>
 
-                {% for venue in venues %}
-
-                    <option
-                        value="{{ venue.id }}"
-                        {% if venue.id == event.venue_id %}
-                            selected
-                        {% endif %}
-                    >
-                        {{ venue.name }} - {{ venue.city }}
-                    </option>
-
-                {% endfor %}
-
-            </select>
-        </p>
+                </div>
 
 
-        <p>
-            <label for="event_date">
-                Event Date
-            </label>
+                <div class="form-grid">
 
-            <br>
+                    <div class="form-group">
 
-            <input
-                type="date"
-                id="event_date"
-                name="event_date"
-                value="{{ event.event_date }}"
-                required
-            >
-        </p>
+                        <label for="category_id">
+                            Category
+                        </label>
 
+                        <select
+                            id="category_id"
+                            name="category_id"
+                            required
+                        >
 
-        <p>
-            <label for="start_time">
-                Start Time
-            </label>
+                            {% for category in categories %}
 
-            <br>
+                                <option
+                                    value="{{ category.id }}"
+                                    {% if category.id == event.category_id %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    {{ category.name }}
+                                </option>
 
-            <input
-                type="time"
-                id="start_time"
-                name="start_time"
-                value="{{ event.start_time }}"
-                required
-            >
-        </p>
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
 
 
-        <p>
-            <label for="end_time">
-                End Time
-            </label>
+                    <div class="form-group">
 
-            <br>
+                        <label for="venue_id">
+                            Venue
+                        </label>
 
-            <input
-                type="time"
-                id="end_time"
-                name="end_time"
-                value="{{ event.end_time }}"
-                required
-            >
-        </p>
+                        <select
+                            id="venue_id"
+                            name="venue_id"
+                            required
+                        >
+
+                            {% for venue in venues %}
+
+                                <option
+                                    value="{{ venue.id }}"
+                                    {% if venue.id == event.venue_id %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    {{ venue.name }} — {{ venue.city }}
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </div>
 
 
-        <p>
-            <label for="status">
-                Status
-            </label>
+            <div class="form-section">
 
-            <br>
+                <div class="form-section-title">
+                    Schedule
+                </div>
 
-            <select
-                id="status"
-                name="status"
-            >
 
-                <option
-                    value="DRAFT"
-                    {% if event.status == "DRAFT" %}
-                        selected
-                    {% endif %}
+                <div class="form-grid">
+
+                    <div class="form-group">
+
+                        <label for="event_date">
+                            Event Date
+                        </label>
+
+                        <input
+                            type="date"
+                            id="event_date"
+                            name="event_date"
+                            value="{{ event.event_date }}"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="status">
+                            Status
+                        </label>
+
+                        <select
+                            id="status"
+                            name="status"
+                        >
+
+                            {% for status in [
+                                "DRAFT",
+                                "PUBLISHED",
+                                "CANCELLED",
+                                "COMPLETED"
+                            ] %}
+
+                                <option
+                                    value="{{ status }}"
+                                    {% if event.status == status %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    {{ status|title }}
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+
+                        <label for="start_time">
+                            Start Time
+                        </label>
+
+                        <input
+                            type="time"
+                            id="start_time"
+                            name="start_time"
+                            value="{{ event.start_time }}"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="end_time">
+                            End Time
+                        </label>
+
+                        <input
+                            type="time"
+                            id="end_time"
+                            name="end_time"
+                            value="{{ event.end_time }}"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="form-actions">
+
+                <a
+                    href="{{ url_for('admin.events') }}"
+                    class="btn btn-secondary"
                 >
-                    Draft
-                </option>
+                    Cancel
+                </a>
 
-                <option
-                    value="PUBLISHED"
-                    {% if event.status == "PUBLISHED" %}
-                        selected
-                    {% endif %}
+                <button
+                    type="submit"
+                    class="btn btn-primary"
                 >
-                    Published
-                </option>
+                    Save Changes
+                </button>
 
-                <option
-                    value="CANCELLED"
-                    {% if event.status == "CANCELLED" %}
-                        selected
-                    {% endif %}
-                >
-                    Cancelled
-                </option>
+            </div>
 
-                <option
-                    value="COMPLETED"
-                    {% if event.status == "COMPLETED" %}
-                        selected
-                    {% endif %}
-                >
-                    Completed
-                </option>
+        </form>
 
-            </select>
-        </p>
+    </div>
 
+</div>
 
-        <button type="submit">
-            Update Event
-        </button>
-
-    </form>
-
-</body>
-
-</html>
+{% endblock %}

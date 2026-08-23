@@ -1,216 +1,299 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
+{% block title %}
+    Bookings
+{% endblock %}
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+{% block content %}
 
-    <title>Manage Bookings</title>
-</head>
+<div class="page-header">
 
-<body>
+    <span class="eyebrow">
+        OPERATIONS
+    </span>
 
-    <h1>Manage Bookings</h1>
+    <h1>
+        Bookings
+    </h1>
 
-    <p>
-        <a href="{{ url_for('admin.dashboard') }}">
-            ← Dashboard
-        </a>
+    <p class="page-subtitle">
+        Search and review customer ticket bookings.
     </p>
 
-    <hr>
+</div>
 
-    <!-- Filters -->
+
+<div class="filter-card">
 
     <form
         method="GET"
         action="{{ url_for('admin.bookings') }}"
+        class="filter-form"
     >
 
-        <label for="booking_reference">
-            Booking Reference:
-        </label>
+        <div class="form-group">
 
-        <input
-            type="text"
-            id="booking_reference"
-            name="booking_reference"
-            value="{{ booking_reference }}"
-            placeholder="Search booking reference"
-        >   
+            <label for="booking_reference">
+                Booking Reference
+            </label>
 
-        <label for="status">
-            Status:
-        </label>
-
-        <select
-            id="status"
-            name="status"
-        >
-
-            <option
-                value=""
-                {% if not selected_status %}
-                    selected
-                {% endif %}
+            <input
+                type="text"
+                id="booking_reference"
+                name="booking_reference"
+                value="{{ booking_reference }}"
+                placeholder="e.g. BK-ABC123"
             >
-                All
-            </option>
 
-            <option
-                value="CONFIRMED"
-                {% if selected_status == "CONFIRMED" %}
-                    selected
-                {% endif %}
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="status">
+                Status
+            </label>
+
+            <select
+                id="status"
+                name="status"
             >
-                Confirmed
-            </option>
 
-            <option
-                value="CANCELLED"
-                {% if selected_status == "CANCELLED" %}
-                    selected
-                {% endif %}
+                <option
+                    value=""
+                    {% if not selected_status %}
+                        selected
+                    {% endif %}
+                >
+                    All Statuses
+                </option>
+
+                <option
+                    value="CONFIRMED"
+                    {% if selected_status == "CONFIRMED" %}
+                        selected
+                    {% endif %}
+                >
+                    Confirmed
+                </option>
+
+                <option
+                    value="CANCELLED"
+                    {% if selected_status == "CANCELLED" %}
+                        selected
+                    {% endif %}
+                >
+                    Cancelled
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="filter-actions">
+
+            <button
+                type="submit"
+                class="btn btn-primary"
             >
-                Cancelled
-            </option>
+                Search
+            </button>
 
-        </select>
+            <a
+                href="{{ url_for('admin.bookings') }}"
+                class="btn btn-secondary"
+            >
+                Clear
+            </a>
 
-        <button type="submit">
-            Filter
-        </button>
-
-        <a href="{{ url_for('admin.bookings') }}">
-            Clear
-        </a>
+        </div>
 
     </form>
 
-    <hr>
+</div>
+
+
+<div class="admin-table-card">
 
     {% if bookings.items %}
 
-        <table border="1" cellpadding="8">
+        <div class="table-wrapper">
 
-            <thead>
+            <table class="data-table">
 
-                <tr>
-                    <th>Reference</th>
-                    <th>Customer</th>
-                    <th>Event</th>
-                    <th>Amount</th>
-                    <th>Status</th>
-                    <th>Booked At</th>
-                    <th>Action</th>
-                </tr>
-
-            </thead>
-
-            <tbody>
-
-                {% for booking in bookings.items %}
+                <thead>
 
                     <tr>
-
-                        <td>
-                            {{ booking.booking_reference }}
-                        </td>
-
-                        <td>
-                            {{ booking.user.name }}
-                        </td>
-
-                        <td>
-                            {{ booking.event.name }}
-                        </td>
-
-                        <td>
-                            ₹{{ booking.total_amount }}
-                        </td>
-
-                        <td>
-                            {{ booking.status }}
-                        </td>
-
-                        <td>
-                            {{ booking.booked_at.strftime(
-                                "%Y-%m-%d %H:%M"
-                            ) }}
-                        </td>
-
-                        <td>
-
-                            <a
-                                href="{{ url_for(
-                                    'admin.booking_details',
-                                    booking_id=booking.id
-                                ) }}"
-                            >
-                                View Details
-                            </a>
-
-                        </td>
-
+                        <th>Reference</th>
+                        <th>Customer</th>
+                        <th>Event</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Booked</th>
+                        <th></th>
                     </tr>
 
-                {% endfor %}
+                </thead>
 
-            </tbody>
 
-        </table>
+                <tbody>
 
-        <!-- Pagination -->
+                    {% for booking in bookings.items %}
 
-        <p>
+                        <tr>
 
-            {% if bookings.has_prev %}
+                            <td>
 
-                <a
-                    href="{{ url_for(
-                        'admin.bookings',
-                        page=bookings.prev_num,
-                        booking_reference=booking_reference,
-                        status=selected_status
-                    ) }}"
-                >
-                    ← Previous
-                </a>
+                                <strong class="booking-reference">
+                                    {{ booking.booking_reference }}
+                                </strong>
 
-            {% endif %}
+                            </td>
 
-            Page {{ bookings.page }}
-            of {{ bookings.pages }}
 
-            {% if bookings.has_next %}
+                            <td>
 
-                <a
-                    href="{{ url_for(
-                        'admin.bookings',
-                        page=bookings.next_num,
-                        booking_reference=booking_reference,
-                        status=selected_status
-                    ) }}"
-                >
-                    Next →
-                </a>
+                                <strong>
+                                    {{ booking.user.name }}
+                                </strong>
 
-            {% endif %}
+                            </td>
 
-        </p>
+
+                            <td>
+                                {{ booking.event.name }}
+                            </td>
+
+
+                            <td>
+
+                                <strong>
+                                    ₹{{ booking.total_amount }}
+                                </strong>
+
+                            </td>
+
+
+                            <td>
+
+                                {% if booking.status == "CONFIRMED" %}
+
+                                    <span class="status-badge status-success">
+                                        Confirmed
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="status-badge status-danger">
+                                        Cancelled
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td class="table-secondary">
+
+                                {{ booking.booked_at.strftime(
+                                    "%Y-%m-%d %H:%M"
+                                ) }}
+
+                            </td>
+
+
+                            <td>
+
+                                <a
+                                    href="{{ url_for(
+                                        'admin.booking_details',
+                                        booking_id=booking.id
+                                    ) }}"
+                                    class="table-action"
+                                >
+                                    View
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        {% if bookings.pages > 1 %}
+
+            <div class="pagination">
+
+                {% if bookings.has_prev %}
+
+                    <a
+                        href="{{ url_for(
+                            'admin.bookings',
+                            page=bookings.prev_num,
+                            booking_reference=booking_reference,
+                            status=selected_status
+                        ) }}"
+                        class="pagination-link"
+                    >
+                        ← Previous
+                    </a>
+
+                {% endif %}
+
+
+                <span class="pagination-current">
+                    Page {{ bookings.page }} of {{ bookings.pages }}
+                </span>
+
+
+                {% if bookings.has_next %}
+
+                    <a
+                        href="{{ url_for(
+                            'admin.bookings',
+                            page=bookings.next_num,
+                            booking_reference=booking_reference,
+                            status=selected_status
+                        ) }}"
+                        class="pagination-link"
+                    >
+                        Next →
+                    </a>
+
+                {% endif %}
+
+            </div>
+
+        {% endif %}
 
     {% else %}
 
-        <p>
-            No bookings found.
-        </p>
+        <div class="empty-state">
+
+            <div class="empty-state-icon">
+                B
+            </div>
+
+            <h3>
+                No bookings found
+            </h3>
+
+            <p>
+                Try changing your search or filter criteria.
+            </p>
+
+        </div>
 
     {% endif %}
 
-</body>
+</div>
 
-</html>
+{% endblock %}

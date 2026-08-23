@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Ticket Booking System
+{% endblock %}
+
+{% block content %}
+
+<section class="home-hero">
+
+    <div class="home-hero-content">
+
+        <span class="home-eyebrow">
+            ONLINE TICKETING PLATFORM
+        </span>
+
+        <h1>
+            Book Your Next
+            <span>Experience.</span>
+        </h1>
+
+        <p class="home-description">
+            Discover upcoming events, choose your seats,
+            and manage your bookings from one simple platform.
+        </p>
+
+
+        <div class="home-actions">
+
+            {% if session.get("role") == "CUSTOMER" %}
+
+                <a
+                    href="{{ url_for('customer.events') }}"
+                    class="btn btn-primary"
+                >
+                    Browse Events
+                </a>
+
+                <a
+                    href="{{ url_for('customer.bookings') }}"
+                    class="btn btn-secondary"
+                >
+                    My Bookings
+                </a>
+
+            {% elif session.get("role") == "ADMIN" %}
+
+                <a
+                    href="{{ url_for('admin.dashboard') }}"
+                    class="btn btn-primary"
+                >
+                    Admin Dashboard
+                </a>
+
+            {% else %}
+
+                <a
+                    href="{{ url_for('auth.login') }}"
+                    class="btn btn-primary"
+                >
+                    Login
+                </a>
+
+                <a
+                    href="{{ url_for('auth.register') }}"
+                    class="btn btn-secondary"
+                >
+                    Create Account
+                </a>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <div class="home-hero-panel">
+
+        <div class="ticket-icon">
+            🎟
+        </div>
+
+        <span class="panel-label">
+            YOUR TICKETS
+        </span>
+
+        <h2>
+            Everything in one place.
+        </h2>
+
+        <p>
+            Browse events, check seat availability,
+            reserve tickets, and manage your bookings.
+        </p>
+
+
+        <div class="panel-items">
+
+            <div class="panel-item">
+                <span>✓</span>
+                Discover events
+            </div>
+
+            <div class="panel-item">
+                <span>✓</span>
+                Select available seats
+            </div>
+
+            <div class="panel-item">
+                <span>✓</span>
+                Manage your bookings
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="home-features">
+
+    <div class="home-section-heading">
+
+        <span>
+            SIMPLE. FAST. RELIABLE.
+        </span>
+
+        <h2>
+            Everything you need to book tickets
+        </h2>
+
+    </div>
+
+
+    <div class="feature-grid">
+
+        <div class="card feature-card">
+
+            <div class="feature-icon">
+                ◉
+            </div>
+
+            <h3>
+                Discover Events
+            </h3>
+
+            <p>
+                Search and filter published events by
+                category, venue, and date.
+            </p>
+
+        </div>
+
+
+        <div class="card feature-card">
+
+            <div class="feature-icon">
+                ✓
+            </div>
+
+            <h3>
+                Choose Your Seats
+            </h3>
+
+            <p>
+                Check seat availability and select
+                the seats that work best for you.
+            </p>
+
+        </div>
+
+
+        <div class="card feature-card">
+
+            <div class="feature-icon">
+                ▣
+            </div>
+
+            <h3>
+                Manage Bookings
+            </h3>
+
+            <p>
+                View your reservations, ticket details,
+                and cancellation options.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

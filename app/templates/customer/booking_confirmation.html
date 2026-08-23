@@ -1,160 +1,225 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
+{% block title %}
+    Booking Confirmation
+{% endblock %}
 
-    <meta charset="UTF-8">
+{% block content %}
 
-    <title>
-        Booking Confirmation
-    </title>
-
-</head>
-
-<body>
+<div class="page-header">
 
     <h1>
-        Booking Confirmed
+        Booking Confirmation
     </h1>
 
     <p>
-        Your booking has been successfully created.
+        Your reservation has been successfully created.
     </p>
 
-
-    <hr>
-
-
-    <p>
-        <strong>
-            Booking Reference:
-        </strong>
-
-        {{ booking.booking_reference }}
-    </p>
+</div>
 
 
-    <p>
-        <strong>
-            Event:
-        </strong>
+<div class="booking-summary">
 
-        {{ booking.event.name }}
-    </p>
+    <div class="card">
 
+        <div class="card-body">
 
-    <p>
-        <strong>
-            Date:
-        </strong>
+            <div class="booking-reference">
 
-        {{ booking.event.event_date }}
-    </p>
+                <span>
+                    Booking Reference
+                </span>
 
+                <strong>
+                    {{ booking.booking_reference }}
+                </strong>
 
-    <p>
-        <strong>
-            Time:
-        </strong>
-
-        {{ booking.event.start_time }}
-        -
-        {{ booking.event.end_time }}
-    </p>
+            </div>
 
 
-    <p>
-        <strong>
-            Total Amount:
-        </strong>
+            <div class="booking-details">
 
-        ₹{{ booking.total_amount }}
-    </p>
+                <div class="detail-row">
 
+                    <span class="detail-label">
+                        Event
+                    </span>
 
-    <p>
-        <strong>
-            Status:
-        </strong>
+                    <span class="detail-value">
+                        {{ booking.event.name }}
+                    </span>
 
-        {{ booking.status }}
-    </p>
+                </div>
 
 
-    <h2>
-        Seats
-    </h2>
+                <div class="detail-row">
+
+                    <span class="detail-label">
+                        Date
+                    </span>
+
+                    <span class="detail-value">
+                        {{ booking.event.event_date }}
+                    </span>
+
+                </div>
 
 
-    {% if booking.items %}
+                <div class="detail-row">
 
-        <table border="1" cellpadding="8">
+                    <span class="detail-label">
+                        Time
+                    </span>
 
-            <thead>
+                    <span class="detail-value">
+                        {{ booking.event.start_time }}
+                        -
+                        {{ booking.event.end_time }}
+                    </span>
 
-                <tr>
-
-                    <th>
-                        Seat
-                    </th>
-
-                    <th>
-                        Type
-                    </th>
-
-                    <th>
-                        Price
-                    </th>
-
-                </tr>
-
-            </thead>
+                </div>
 
 
-            <tbody>
+                <div class="detail-row">
 
-                {% for item in booking.items %}
+                    <span class="detail-label">
+                        Total Amount
+                    </span>
 
-                    <tr>
+                    <span class="detail-value">
+                        ₹{{ booking.total_amount }}
+                    </span>
 
-                        <td>
-                            {{ item.seat.seat_number }}
-                        </td>
-
-                        <td>
-                            {{ item.seat.seat_type }}
-                        </td>
-
-                        <td>
-                            ₹{{ item.price }}
-                        </td>
-
-                    </tr>
-
-                {% endfor %}
-
-            </tbody>
-
-        </table>
-
-    {% endif %}
+                </div>
 
 
-    <br>
+                <div class="detail-row">
+
+                    <span class="detail-label">
+                        Status
+                    </span>
+
+                    <span class="detail-value">
+
+                        {% if booking.status == "CONFIRMED" %}
+
+                            <span class="badge badge-success">
+                                CONFIRMED
+                            </span>
+
+                        {% elif booking.status == "CANCELLED" %}
+
+                            <span class="badge badge-danger">
+                                CANCELLED
+                            </span>
+
+                        {% else %}
+
+                            <span class="badge badge-warning">
+                                {{ booking.status }}
+                            </span>
+
+                        {% endif %}
+
+                    </span>
+
+                </div>
+
+            </div>
 
 
-    <a href="{{ url_for('customer.bookings') }}">
-        View My Bookings
-    </a>
+            <div style="margin-top: 30px;">
+
+                <h2 style="margin-bottom: 15px;">
+                    Reserved Seats
+                </h2>
 
 
-    <br>
+                {% if booking.items %}
+
+                    <div class="table-wrapper">
+
+                        <table class="data-table">
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>
+                                        Seat
+                                    </th>
+
+                                    <th>
+                                        Type
+                                    </th>
+
+                                    <th>
+                                        Price
+                                    </th>
+
+                                </tr>
+
+                            </thead>
 
 
-    <a href="{{ url_for('customer.events') }}">
-        Browse More Events
-    </a>
+                            <tbody>
 
-</body>
+                                {% for item in booking.items %}
 
-</html>
+                                    <tr>
+
+                                        <td>
+                                            <strong>
+                                                {{ item.seat.seat_number }}
+                                            </strong>
+                                        </td>
+
+                                        <td>
+                                            {{ item.seat.seat_type }}
+                                        </td>
+
+                                        <td>
+                                            ₹{{ item.price }}
+                                        </td>
+
+                                    </tr>
+
+                                {% endfor %}
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <div class="form-actions">
+
+                <a
+                    href="{{ url_for('customer.bookings') }}"
+                    class="btn btn-primary"
+                >
+                    View My Bookings
+                </a>
+
+                <a
+                    href="{{ url_for('customer.events') }}"
+                    class="btn btn-secondary"
+                >
+                    Browse More Events
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

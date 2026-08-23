@@ -1,149 +1,365 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
+{% block title %}
+    Booking Details
+{% endblock %}
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
+{% block content %}
+
+<div class="page-header page-header-row">
+
+    <div>
+
+        <span class="eyebrow">
+            BOOKING
+        </span>
+
+        <h1>
+            {{ booking.booking_reference }}
+        </h1>
+
+        <p class="page-subtitle">
+            Booking details and customer information.
+        </p>
+
+    </div>
+
+
+    <a
+        href="{{ url_for('admin.bookings') }}"
+        class="btn btn-secondary"
     >
+        ← Back to Bookings
+    </a>
 
-    <title>Booking Details</title>
-</head>
+</div>
 
-<body>
 
-    <h1>Booking Details</h1>
+<div class="booking-detail-grid">
 
-    <p>
-        <a href="{{ url_for('admin.bookings') }}">
-            ← Back to Bookings
-        </a>
-    </p>
+    <!-- Booking Summary -->
 
-    <hr>
+    <div class="detail-card">
 
-    <h2>
-        {{ booking.booking_reference }}
-    </h2>
+        <div class="detail-card-header">
 
-    <p>
-        <strong>Status:</strong>
-        {{ booking.status }}
-    </p>
+            <div>
 
-    <h3>Customer</h3>
+                <span class="detail-label">
+                    BOOKING REFERENCE
+                </span>
 
-    <p>
-        <strong>Name:</strong>
-        {{ booking.user.name }}
-    </p>
+                <h2>
+                    {{ booking.booking_reference }}
+                </h2>
 
-    <p>
-        <strong>Email:</strong>
-        {{ booking.user.email }}
-    </p>
+            </div>
 
-    <h3>Event</h3>
 
-    <p>
-        <strong>Name:</strong>
-        {{ booking.event.name }}
-    </p>
+            {% if booking.status == "CONFIRMED" %}
 
-    <p>
-        <strong>Date:</strong>
-        {{ booking.event.event_date }}
-    </p>
+                <span class="status-badge status-success">
+                    Confirmed
+                </span>
 
-    <p>
-        <strong>Time:</strong>
-        {{ booking.event.start_time }}
-        -
-        {{ booking.event.end_time }}
-    </p>
+            {% else %}
 
-    <h3>Seats</h3>
+                <span class="status-badge status-danger">
+                    Cancelled
+                </span>
 
-    {% if booking.items %}
+            {% endif %}
 
-        <table border="1" cellpadding="8">
+        </div>
 
-            <thead>
-                <tr>
-                    <th>Seat</th>
-                    <th>Type</th>
-                    <th>Price</th>
-                </tr>
-            </thead>
 
-            <tbody>
+        <div class="detail-list">
 
-                {% for item in booking.items %}
+            <div class="detail-row">
 
-                    <tr>
+                <span>
+                    Booking ID
+                </span>
 
-                        <td>
-                            {{ item.seat.seat_number }}
-                        </td>
+                <strong>
+                    #{{ booking.id }}
+                </strong>
 
-                        <td>
-                            {{ item.seat.seat_type }}
-                        </td>
+            </div>
 
-                        <td>
-                            ₹{{ item.price }}
-                        </td>
 
-                    </tr>
+            <div class="detail-row">
 
-                {% endfor %}
+                <span>
+                    Total Amount
+                </span>
 
-            </tbody>
+                <strong class="detail-price">
+                    ₹{{ booking.total_amount }}
+                </strong>
 
-        </table>
+            </div>
 
-    {% else %}
 
-        <p>
-            No booking items found.
-        </p>
+            <div class="detail-row">
 
-    {% endif %}
+                <span>
+                    Booked At
+                </span>
 
-    <h3>Payment Summary</h3>
+                <strong>
+                    {{ booking.booked_at }}
+                </strong>
 
-    <p>
-        <strong>Total Amount:</strong>
-        ₹{{ booking.total_amount }}
-    </p>
+            </div>
 
-    <h3>Booking Information</h3>
 
-    <p>
-        <strong>Booked At:</strong>
+            {% if booking.cancelled_at %}
 
-        {{ booking.booked_at.strftime(
-            "%Y-%m-%d %H:%M"
-        ) }}
-    </p>
+                <div class="detail-row">
 
-    {% if booking.cancelled_at %}
+                    <span>
+                        Cancelled At
+                    </span>
 
-        <p>
-            <strong>Cancelled At:</strong>
+                    <strong>
+                        {{ booking.cancelled_at }}
+                    </strong>
 
-            {{ booking.cancelled_at.strftime(
-                "%Y-%m-%d %H:%M"
-            ) }}
-        </p>
+                </div>
 
-    {% endif %}
+            {% endif %}
 
-    {% if booking.status == "CONFIRMED" %}
+        </div>
 
-        <hr>
+    </div>
+
+
+    <!-- Customer -->
+
+    <div class="detail-card">
+
+        <div class="detail-card-header">
+
+            <div>
+
+                <span class="detail-label">
+                    CUSTOMER
+                </span>
+
+                <h2>
+                    Customer Information
+                </h2>
+
+            </div>
+
+        </div>
+
+
+        <div class="customer-detail">
+
+            <div class="customer-avatar">
+                {{ booking.user.name[0]|upper }}
+            </div>
+
+            <div>
+
+                <strong>
+                    {{ booking.user.name }}
+                </strong>
+
+                <span>
+                    {{ booking.user.email }}
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Event -->
+
+    <div class="detail-card detail-card-wide">
+
+        <div class="detail-card-header">
+
+            <div>
+
+                <span class="detail-label">
+                    EVENT
+                </span>
+
+                <h2>
+                    {{ booking.event.name }}
+                </h2>
+
+            </div>
+
+        </div>
+
+
+        <div class="event-detail-grid">
+
+            <div>
+
+                <span>
+                    Date
+                </span>
+
+                <strong>
+                    {{ booking.event.event_date }}
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    Time
+                </span>
+
+                <strong>
+                    {{ booking.event.start_time }}
+                    –
+                    {{ booking.event.end_time }}
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    Category
+                </span>
+
+                <strong>
+                    {{ booking.event.category.name }}
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    Venue
+                </span>
+
+                <strong>
+                    {{ booking.event.venue.name }}
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Seats -->
+
+    <div class="detail-card detail-card-wide">
+
+        <div class="detail-card-header">
+
+            <div>
+
+                <span class="detail-label">
+                    TICKETS
+                </span>
+
+                <h2>
+                    Reserved Seats
+                </h2>
+
+            </div>
+
+            <span class="seat-count">
+                {{ booking.items|length }} seat(s)
+            </span>
+
+        </div>
+
+
+        <div class="seat-detail-table">
+
+            <div class="seat-detail-header">
+
+                <span>
+                    Seat
+                </span>
+
+                <span>
+                    Type
+                </span>
+
+                <span>
+                    Row
+                </span>
+
+                <span>
+                    Price
+                </span>
+
+            </div>
+
+
+            {% for item in booking.items %}
+
+                <div class="seat-detail-row">
+
+                    <strong>
+                        {{ item.seat.seat_number }}
+                    </strong>
+
+                    <span>
+                        {{ item.seat.seat_type }}
+                    </span>
+
+                    <span>
+                        Row {{ item.seat.row_number }}
+                    </span>
+
+                    <strong>
+                        ₹{{ item.price }}
+                    </strong>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+</div>
+
+
+{% if booking.status == "CONFIRMED" %}
+
+    <div class="danger-action-card">
+
+        <div>
+
+            <span class="detail-label">
+                BOOKING ACTION
+            </span>
+
+            <h3>
+                Cancel this booking
+            </h3>
+
+            <p>
+                Cancelling the booking will release the reserved
+                seats and mark the booking as cancelled.
+            </p>
+
+        </div>
+
 
         <form
             method="POST"
@@ -153,14 +369,20 @@
             ) }}"
         >
 
-            <button type="submit">
+            <button
+                type="submit"
+                class="btn btn-danger"
+                onclick="return confirm(
+                    'Are you sure you want to cancel this booking?'
+                );"
+            >
                 Cancel Booking
             </button>
 
         </form>
 
-    {% endif %}
+    </div>
 
-</body>
+{% endif %}
 
-</html>
+{% endblock %}

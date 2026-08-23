@@ -1,119 +1,184 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
+{% block title %}
+    {{ event.name }} - Ticket Booking System
+{% endblock %}
 
-    <meta charset="UTF-8">
+{% block content %}
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
+<div class="page-header">
+
+    <a
+        href="{{ url_for('customer.events') }}"
+        style="color: var(--primary); font-weight: 600;"
     >
+        ← Back to Events
+    </a>
 
-    <title>{{ event.name }}</title>
-
-</head>
-
-
-<body>
-
-    <p>
-
-        <a href="{{ url_for('customer.events') }}">
-            ← Back to Events
-        </a>
-
-    </p>
+</div>
 
 
-    <h1>
-        {{ event.name }}
-    </h1>
+<div class="card">
+
+    <div class="card-header">
+
+        <div>
+
+            <h1>
+                {{ event.name }}
+            </h1>
+
+            <p style="color: var(--text-light); margin-top: 4px;">
+                Event Details
+            </p>
+
+        </div>
 
 
-    <p>
-        <strong>Status:</strong>
-        {{ event.status }}
-    </p>
+        {% if event.status == "PUBLISHED" %}
 
+            <span class="badge badge-success">
+                {{ event.status }}
+            </span>
 
-    <p>
-        <strong>Date:</strong>
-        {{ event.event_date }}
-    </p>
+        {% elif event.status == "DRAFT" %}
 
-
-    <p>
-        <strong>Time:</strong>
-        {{ event.start_time }}
-        -
-        {{ event.end_time }}
-    </p>
-
-
-    <p>
-        <strong>Description:</strong>
-    </p>
-
-    <p>
-        {{ event.description or "No description available." }}
-    </p>
-
-
-    <p>
-        <strong>Category:</strong>
-
-        {% if event.category %}
-            {{ event.category.name }}
-        {% else %}
-            N/A
-        {% endif %}
-
-    </p>
-
-
-    <p>
-        <strong>Venue:</strong>
-
-        {% if event.venue %}
-
-            {{ event.venue.name }}
-
-            <br>
-
-            {{ event.venue.address }}
-
-            <br>
-
-            {{ event.venue.city }}
+            <span class="badge badge-warning">
+                {{ event.status }}
+            </span>
 
         {% else %}
 
-            N/A
+            <span class="badge badge-danger">
+                {{ event.status }}
+            </span>
 
         {% endif %}
 
-    </p>
+    </div>
 
 
-    {% if event.status == "PUBLISHED" %}
+    <div class="card-body">
 
-        <p>
+        <div class="booking-details">
 
-            <a
-                href="{{ url_for(
-                    'customer.event_seats',
-                    event_id=event.id
-                ) }}"
-            >
-                View Available Seats
-            </a>
+            <div class="detail-row">
 
-        </p>
+                <span class="detail-label">
+                    Date
+                </span>
 
-    {% endif %}
+                <span class="detail-value">
+                    {{ event.event_date }}
+                </span>
+
+            </div>
 
 
-</body>
+            <div class="detail-row">
 
-</html>
+                <span class="detail-label">
+                    Time
+                </span>
+
+                <span class="detail-value">
+                    {{ event.start_time }} - {{ event.end_time }}
+                </span>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <span class="detail-label">
+                    Category
+                </span>
+
+                <span class="detail-value">
+
+                    {% if event.category %}
+                        {{ event.category.name }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+
+                </span>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <span class="detail-label">
+                    Venue
+                </span>
+
+                <span class="detail-value">
+
+                    {% if event.venue %}
+                        {{ event.venue.name }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+
+                </span>
+
+            </div>
+
+
+            {% if event.venue %}
+
+                <div class="detail-row">
+
+                    <span class="detail-label">
+                        Location
+                    </span>
+
+                    <span class="detail-value">
+                        {{ event.venue.address }},
+                        {{ event.venue.city }}
+                    </span>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+
+        <div style="margin-top: 28px;">
+
+            <h3>
+                About This Event
+            </h3>
+
+            <p style="color: var(--text-light); margin-top: 8px;">
+                {{ event.description or "No description available." }}
+            </p>
+
+        </div>
+
+
+        {% if event.status == "PUBLISHED" %}
+
+            <div class="form-actions">
+
+                <a
+                    href="{{ url_for(
+                        'customer.event_seats',
+                        event_id=event.id
+                    ) }}"
+                    class="btn btn-primary"
+                >
+                    View Available Seats
+                </a>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}
