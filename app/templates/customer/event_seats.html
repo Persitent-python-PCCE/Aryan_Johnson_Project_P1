@@ -1,8 +1,10 @@
 {% extends "base.html" %}
 
+
 {% block title %}
     Select Seats - {{ event.name }}
 {% endblock %}
+
 
 {% block content %}
 
@@ -13,27 +15,36 @@
             'customer.event_details',
             event_id=event.id
         ) }}"
-        style="color: var(--primary); font-weight: 600;"
+        style="
+            color: var(--primary);
+            font-weight: 600;
+        "
     >
         ← Back to Event
     </a>
 
+
     <h1 style="margin-top: 15px;">
         Select Your Seats
     </h1>
+
 
     <p>
         {{ event.name }}
         ·
         {{ event.event_date }}
         ·
-        {{ event.start_time }} - {{ event.end_time }}
+        {{ event.start_time }}
+        -
+        {{ event.end_time }}
     </p>
 
 </div>
 
 
-{% with messages = get_flashed_messages(with_categories=true) %}
+{% with messages = get_flashed_messages(
+    with_categories=true
+) %}
 
     {% if messages %}
 
@@ -56,12 +67,138 @@
 
         <div class="card-body">
 
+
+            <!-- =====================================================
+                 THEATRE STAGE
+                 ===================================================== -->
+
             <div class="stage">
                 STAGE
             </div>
 
 
             {% if seats %}
+
+
+                <!-- =================================================
+                     SEAT STATUS + PRICE LEGEND
+                     ================================================= -->
+
+                <div class="seat-info-bar">
+
+
+                    <!-- Seat Status -->
+
+                    <div class="seat-status-legend">
+
+                        <span class="legend-item">
+
+                            <span class="legend-box"></span>
+
+                            Available
+
+                        </span>
+
+
+                        <span class="legend-item">
+
+                            <span
+                                class="
+                                    legend-box
+                                    legend-box-selected
+                                "
+                            ></span>
+
+                            Selected
+
+                        </span>
+
+                    </div>
+
+
+                    <!-- Seat Pricing -->
+
+                    <div class="seat-price-legend">
+
+
+                        <span class="legend-item">
+
+                            <span
+                                class="
+                                    legend-box
+                                    legend-box-vip
+                                "
+                            ></span>
+
+                            <span class="price-label">
+                                VIP
+                            </span>
+
+                            <span
+                                class="
+                                    price-value
+                                    price-vip
+                                "
+                            >
+                                ₹2500
+                            </span>
+
+                        </span>
+
+
+                        <span class="legend-item">
+
+                            <span
+                                class="
+                                    legend-box
+                                    legend-box-premium
+                                "
+                            ></span>
+
+                            <span class="price-label">
+                                Premium
+                            </span>
+
+                            <span
+                                class="
+                                    price-value
+                                    price-premium
+                                "
+                            >
+                                ₹1800
+                            </span>
+
+                        </span>
+
+
+                        <span class="legend-item">
+
+                            <span class="legend-box"></span>
+
+                            <span class="price-label">
+                                Regular
+                            </span>
+
+                            <span
+                                class="
+                                    price-value
+                                    price-regular
+                                "
+                            >
+                                ₹1000
+                            </span>
+
+                        </span>
+
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     BOOKING FORM
+                     ================================================= -->
 
                 <form
                     method="POST"
@@ -71,11 +208,18 @@
                     ) }}"
                 >
 
+
+                    <!-- =============================================
+                         SEAT GRID
+                         ============================================= -->
+
                     <div class="seat-grid">
+
 
                         {% for seat in seats %}
 
                             <div class="seat">
+
 
                                 <input
                                     type="checkbox"
@@ -84,52 +228,125 @@
                                     value="{{ seat.id }}"
                                 >
 
-                                <label for="seat-{{ seat.id }}">
 
-                                    <span>
+                                {% if seat.seat_type == "VIP" %}
 
-                                        {{ seat.seat_number }}
+                                    <label
+                                        for="seat-{{ seat.id }}"
+                                        class="
+                                            seat-label
+                                            seat-vip
+                                        "
+                                    >
+
+                                        <span class="seat-number">
+                                            {{ seat.seat_number }}
+                                        </span>
 
                                         <span class="seat-price">
                                             ₹{{ seat.price }}
                                         </span>
 
-                                    </span>
+                                    </label>
 
-                                </label>
+
+                                {% elif seat.seat_type == "PREMIUM" %}
+
+                                    <label
+                                        for="seat-{{ seat.id }}"
+                                        class="
+                                            seat-label
+                                            seat-premium
+                                        "
+                                    >
+
+                                        <span class="seat-number">
+                                            {{ seat.seat_number }}
+                                        </span>
+
+                                        <span class="seat-price">
+                                            ₹{{ seat.price }}
+                                        </span>
+
+                                    </label>
+
+
+                                {% else %}
+
+                                    <label
+                                        for="seat-{{ seat.id }}"
+                                        class="
+                                            seat-label
+                                            seat-regular
+                                        "
+                                    >
+
+                                        <span class="seat-number">
+                                            {{ seat.seat_number }}
+                                        </span>
+
+                                        <span class="seat-price">
+                                            ₹{{ seat.price }}
+                                        </span>
+
+                                    </label>
+
+                                {% endif %}
+
 
                             </div>
 
                         {% endfor %}
 
+
                     </div>
 
 
-                    <div style="
-                        margin-top: 28px;
-                        padding: 16px;
-                        background: #f8fafc;
-                        border-radius: 8px;
-                        text-align: center;
-                    ">
+                    <!-- =================================================
+                         BOOKING ACTION
+                         ================================================= -->
 
-                        <p style="color: var(--text-light);">
-                            {{ seats|length }} seats currently available
+                    <div
+                        style="
+                            margin-top: 32px;
+                            padding: 20px;
+                            background: #f8fafc;
+                            border-radius: 10px;
+                            text-align: center;
+                            border: 1px solid var(--border);
+                        "
+                    >
+
+                        <p
+                            style="
+                                color: var(--text-light);
+                                margin-bottom: 12px;
+                            "
+                        >
+                            {{ seats|length }}
+                            seats currently available
                         </p>
+
 
                         <button
                             type="submit"
                             class="btn btn-primary"
-                            style="margin-top: 10px;"
                         >
-                            Confirm Booking
+                            Continue to Booking
                         </button>
 
                     </div>
 
+
                 </form>
 
+
             {% else %}
+
+
+                <!-- =================================================
+                     NO SEATS AVAILABLE
+                     ================================================= -->
 
                 <div class="empty-state">
 
@@ -137,15 +354,19 @@
                         No Seats Available
                     </h3>
 
+
                     <p>
                         There are currently no available seats
                         for this event.
                     </p>
 
+
                     <div style="margin-top: 18px;">
 
                         <a
-                            href="{{ url_for('customer.events') }}"
+                            href="{{ url_for(
+                                'customer.events'
+                            ) }}"
                             class="btn btn-secondary"
                         >
                             Browse Other Events
@@ -155,32 +376,11 @@
 
                 </div>
 
+
             {% endif %}
 
+
         </div>
-
-    </div>
-
-
-    <div style="
-        display: flex;
-        justify-content: center;
-        gap: 20px;
-        margin-top: 18px;
-        color: var(--text-light);
-        font-size: 13px;
-    ">
-
-        <span>
-            ▢ Available
-        </span>
-
-        <span>
-            <strong style="color: var(--primary);">
-                ▣
-            </strong>
-            Selected
-        </span>
 
     </div>
 
