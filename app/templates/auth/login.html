@@ -1,21 +1,292 @@
 {% extends "base.html" %}
 
+
 {% block title %}
     Login - Ticket Booking System
 {% endblock %}
 
-{% block navbar %}
+
+{% block head %}
+
+<style>
+
+    /* =========================================================
+       LOGIN PAGE
+       ========================================================= */
+
+    .login-page {
+
+        width: 100%;
+        min-height: calc(100vh - 150px);
+
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+
+        padding: 60px 24px 80px;
+
+        box-sizing: border-box;
+    }
+
+
+    .login-card {
+
+        width: 100%;
+        max-width: 480px;
+
+        background: #ffffff;
+
+        border: 1px solid #e2e7ef;
+
+        border-radius: 18px;
+
+        box-shadow:
+            0 12px 35px rgba(15, 23, 42, 0.08);
+
+        overflow: hidden;
+    }
+
+
+    /* =========================================================
+       HEADER
+       ========================================================= */
+
+    .login-header {
+
+        padding: 38px 42px 28px;
+
+        text-align: left;
+
+        border-bottom: 1px solid #edf0f5;
+    }
+
+
+    .login-header h1 {
+
+        margin: 0 0 10px;
+
+        font-size: 32px;
+        line-height: 1.2;
+
+        font-weight: 700;
+
+        color: #172033;
+    }
+
+
+    .login-header p {
+
+        margin: 0;
+
+        font-size: 15px;
+        line-height: 1.5;
+
+        color: #6b7280;
+    }
+
+
+    /* =========================================================
+       FORM
+       ========================================================= */
+
+    .login-form {
+
+        padding: 32px 42px 38px;
+    }
+
+
+    .login-form .form-group {
+
+        margin-bottom: 22px;
+    }
+
+
+    .login-form label {
+
+        display: block;
+
+        margin-bottom: 8px;
+
+        font-size: 14px;
+
+        font-weight: 600;
+
+        color: #172033;
+    }
+
+
+    .login-form input {
+
+        width: 100%;
+
+        min-height: 48px;
+
+        padding: 12px 14px;
+
+        box-sizing: border-box;
+
+        border: 1px solid #d9dee8;
+
+        border-radius: 9px;
+
+        background: #ffffff;
+
+        color: #172033;
+
+        font-size: 14px;
+
+        outline: none;
+
+        transition:
+            border-color 0.2s ease,
+            box-shadow 0.2s ease;
+    }
+
+
+    .login-form input:focus {
+
+        border-color: #3f46a3;
+
+        box-shadow:
+            0 0 0 3px rgba(63, 70, 163, 0.10);
+    }
+
+
+    /* =========================================================
+       BUTTON
+       ========================================================= */
+
+    .login-actions {
+
+        margin-top: 28px;
+    }
+
+
+    .login-actions .btn {
+
+        width: 100%;
+
+        min-height: 48px;
+
+        font-size: 15px;
+
+        font-weight: 600;
+    }
+
+
+    /* =========================================================
+       REGISTER LINK
+       ========================================================= */
+
+    .login-footer {
+
+        margin-top: 28px;
+
+        padding-top: 24px;
+
+        border-top: 1px solid #edf0f5;
+
+        text-align: center;
+    }
+
+
+    .login-footer p {
+
+        margin: 0;
+
+        font-size: 14px;
+
+        color: #6b7280;
+    }
+
+
+    .login-footer a {
+
+        color: #3f46a3;
+
+        font-weight: 600;
+
+        text-decoration: none;
+    }
+
+
+    .login-footer a:hover {
+
+        text-decoration: underline;
+    }
+
+
+    /* =========================================================
+       FLASH MESSAGE
+       ========================================================= */
+
+    .login-page ~ * {
+        box-sizing: border-box;
+    }
+
+
+    .main-content > .flash-container {
+
+        width: min(
+            100% - 48px,
+            1100px
+        );
+
+        margin: 24px auto 0;
+    }
+
+
+    /* =========================================================
+       MOBILE
+       ========================================================= */
+
+    @media (max-width: 600px) {
+
+        .login-page {
+
+            padding: 35px 16px 60px;
+        }
+
+
+        .login-header {
+
+            padding: 30px 26px 24px;
+        }
+
+
+        .login-header h1 {
+
+            font-size: 28px;
+        }
+
+
+        .login-form {
+
+            padding: 28px 26px 32px;
+        }
+
+    }
+
+</style>
+
 {% endblock %}
+
 
 {% block content %}
 
-<div class="auth-wrapper">
+<div class="login-page">
 
-    <div class="card auth-card">
+    <div class="login-card">
 
-        <div class="auth-header">
+        <!-- =====================================================
+             HEADER
+             ===================================================== -->
 
-            <h1>Welcome Back</h1>
+        <div class="login-header">
+
+            <h1>
+                Welcome Back
+            </h1>
 
             <p>
                 Sign in to continue to your account.
@@ -24,24 +295,14 @@
         </div>
 
 
-        {% with messages = get_flashed_messages(with_categories=true) %}
+        <!-- =====================================================
+             FORM
+             ===================================================== -->
 
-            {% if messages %}
-
-                {% for category, message in messages %}
-
-                    <div class="alert alert-{{ category }}">
-                        {{ message }}
-                    </div>
-
-                {% endfor %}
-
-            {% endif %}
-
-        {% endwith %}
-
-
-        <form method="POST">
+        <form
+            method="POST"
+            class="login-form"
+        >
 
             <div class="form-group">
 
@@ -80,36 +341,35 @@
             </div>
 
 
-            <div class="form-actions">
+            <div class="login-actions">
 
                 <button
                     type="submit"
-                    class="btn btn-primary btn-block"
+                    class="btn btn-primary"
                 >
                     Login
                 </button>
 
             </div>
 
+
+            <div class="login-footer">
+
+                <p>
+
+                    Don't have an account?
+
+                    <a
+                        href="{{ url_for('auth.register') }}"
+                    >
+                        Create one
+                    </a>
+
+                </p>
+
+            </div>
+
         </form>
-
-
-        <div style="text-align: center; margin-top: 20px;">
-
-            <p style="color: var(--text-light);">
-
-                Don't have an account?
-
-                <a
-                    href="{{ url_for('auth.register') }}"
-                    style="color: var(--primary); font-weight: 600;"
-                >
-                    Create one
-                </a>
-
-            </p>
-
-        </div>
 
     </div>
 

@@ -1,4 +1,14 @@
-from flask import jsonify, request, session
+from flask import jsonify, request
+from flask_jwt_extended import (
+    create_access_token,
+    create_refresh_token,
+    get_jwt,
+    get_jwt_identity,
+    jwt_required,
+    set_access_cookies,
+    set_refresh_cookies,
+    unset_jwt_cookies
+)
 
 from app.controllers.api import api_bp
 from app.services.auth_service import AuthService
@@ -79,17 +89,28 @@ def login():
     )
 
     try:
+
         user = AuthService.authenticate(
             email=email,
             password=password
         )
 
-        session.clear()
+        access_token = create_access_token(
+            identity=str(user.id),
+            additional_claims={
+                "role": user.role.name,
+                "email": user.email
+            }
+        )
 
-        session["user_id"] = user.id
-        session["role"] = user.role.name
+        refresh_token = create_refresh_token(
+            identity=str(user.id),
+            additional_claims={
+                "role": user.role.name
+            }
+        )
 
-        return jsonify({
+        response = jsonify({
             "status": "success",
             "message": "Login successful",
             "data": {
@@ -98,9 +119,22 @@ def login():
                 "email": user.email,
                 "role": user.role.name
             }
-        }), 200
+        })
+
+        set_access_cookies(
+            response,
+            access_token
+        )
+
+        set_refresh_cookies(
+            response,
+            refresh_token
+        )
+
+        return response, 200
 
     except ValueError as exc:
+
         return jsonify({
             "status": "error",
             "message": str(exc)
@@ -108,14 +142,50 @@ def login():
 
 
 @api_bp.route(
+    "/auth/refresh",
+    methods=["POST"]
+)
+@jwt_required(
+    refresh=True
+)
+def refresh():
+
+    identity = get_jwt_identity()
+
+    claims = get_jwt()
+
+    access_token = create_access_token(
+        identity=identity,
+        additional_claims={
+            "role": claims.get("role")
+        }
+    )
+
+    response = jsonify({
+        "status": "success",
+        "message": "Access token refreshed"
+    })
+
+    set_access_cookies(
+        response,
+        access_token
+    )
+
+    return response, 200
+
+@api_bp.route(
     "/auth/logout",
     methods=["POST"]
 )
 def logout():
 
-    session.clear()
-
-    return jsonify({
+    response = jsonify({
         "status": "success",
         "message": "Logout successful"
-    }), 200
+    })
+
+    unset_jwt_cookies(
+        response
+    )
+
+    return response, 200

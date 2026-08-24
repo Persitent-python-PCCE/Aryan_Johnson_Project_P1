@@ -1,6 +1,7 @@
 from datetime import date
 
 from flask import jsonify, request
+from flask_jwt_extended import jwt_required
 
 from app.controllers.api import api_bp
 from app.services.event_service import EventService
@@ -31,6 +32,7 @@ def serialize_event(event):
     "/events",
     methods=["GET"]
 )
+@jwt_required()
 def get_events():
 
     keyword = request.args.get(
@@ -120,6 +122,7 @@ def get_events():
     "/events/<int:event_id>",
     methods=["GET"]
 )
+@jwt_required()
 def get_event(event_id):
 
     try:

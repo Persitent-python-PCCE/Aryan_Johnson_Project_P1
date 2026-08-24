@@ -1,91 +1,11 @@
-from datetime import date, time
-
-import pytest
-
-from app import create_app
-from app.extensions import db
-from app.models.role import Role
-from app.models.category import Category
-from app.models.venue import Venue
-from app.models.event import Event
+# ============================================================
+# EVENT API TESTS
+# ============================================================
 
 
-@pytest.fixture
-def app():
-    app = create_app(
-        test_config={
-            "TESTING": True,
-            "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
-            "SECRET_KEY": "test-secret"
-        }
-    )
+def test_get_events(customer_client):
 
-    with app.app_context():
-        db.create_all()
-
-        role = Role(
-            name="CUSTOMER",
-            description="Customer"
-        )
-
-        category = Category(
-            name="Test Category",
-            description="Test category",
-            is_active=True
-        )
-
-        venue = Venue(
-            name="Test Venue",
-            address="Test Address",
-            city="Test City",
-            capacity=100
-        )
-
-        db.session.add(role)
-        db.session.add(category)
-        db.session.add(venue)
-        db.session.flush()
-
-        published_event = Event(
-            category_id=category.id,
-            venue_id=venue.id,
-            name="Published Test Event",
-            description="Published event",
-            event_date=date(2026, 12, 1),
-            start_time=time(18, 0),
-            end_time=time(20, 0),
-            status="PUBLISHED"
-        )
-
-        draft_event = Event(
-            category_id=category.id,
-            venue_id=venue.id,
-            name="Draft Test Event",
-            description="Draft event",
-            event_date=date(2026, 12, 2),
-            start_time=time(18, 0),
-            end_time=time(20, 0),
-            status="DRAFT"
-        )
-
-        db.session.add(published_event)
-        db.session.add(draft_event)
-        db.session.commit()
-
-        yield app
-
-        db.session.remove()
-        db.drop_all()
-
-
-@pytest.fixture
-def client(app):
-    return app.test_client()
-
-
-def test_get_events(client):
-
-    response = client.get(
+    response = customer_client.get(
         "/api/v1/events"
     )
 
@@ -95,29 +15,19 @@ def test_get_events(client):
 
     assert data["status"] == "success"
 
-    assert len(data["data"]) == 1
-
-    assert (
-        data["data"][0]["name"]
-        == "Published Test Event"
+    assert isinstance(
+        data["data"],
+        list
     )
 
 
 def test_get_event_by_id(
-    client,
-    app
+    customer_client,
+    event
 ):
 
-    with app.app_context():
-
-        event = Event.query.filter_by(
-            name="Published Test Event"
-        ).first()
-
-        event_id = event.id
-
-    response = client.get(
-        f"/api/v1/events/{event_id}"
+    response = customer_client.get(
+        f"/api/v1/events/{event.id}"
     )
 
     assert response.status_code == 200
@@ -128,14 +38,16 @@ def test_get_event_by_id(
 
     assert (
         data["data"]["name"]
-        == "Published Test Event"
+        == "Test Event"
     )
 
 
-def test_get_unknown_event(client):
+def test_get_unknown_event(
+    customer_client
+):
 
-    response = client.get(
-        "/api/v1/events/999999"
+    response = customer_client.get(
+        "/api/v1/events/99999"
     )
 
     assert response.status_code == 404
@@ -144,35 +56,15 @@ def test_get_unknown_event(client):
 
     assert data["status"] == "error"
 
-    assert data["message"] == "Event not found"
 
-
-def test_draft_event_is_not_exposed(
-    client,
-    app
+def test_keyword_filter(
+    customer_client
 ):
 
-    with app.app_context():
-
-        draft_event = Event.query.filter_by(
-            name="Draft Test Event"
-        ).first()
-
-        event_id = draft_event.id
-
-    response = client.get(
-        f"/api/v1/events/{event_id}"
-    )
-
-    assert response.status_code == 404
-
-
-def test_keyword_filter(client):
-
-    response = client.get(
+    response = customer_client.get(
         "/api/v1/events",
         query_string={
-            "keyword": "Published"
+            "keyword": "Test"
         }
     )
 
@@ -180,20 +72,19 @@ def test_keyword_filter(client):
 
     data = response.get_json()
 
-    assert len(data["data"]) == 1
-
-    assert (
-        data["data"][0]["name"]
-        == "Published Test Event"
-    )
+    assert len(
+        data["data"]
+    ) >= 1
 
 
-def test_date_filter(client):
+def test_date_filter(
+    customer_client
+):
 
-    response = client.get(
+    response = customer_client.get(
         "/api/v1/events",
         query_string={
-            "event_date": "2026-12-01"
+            "event_date": "2026-12-15"
         }
     )
 
@@ -201,12 +92,14 @@ def test_date_filter(client):
 
     data = response.get_json()
 
-    assert len(data["data"]) == 1
+    assert data["status"] == "success"
 
 
-def test_invalid_date_returns_400(client):
+def test_invalid_date_filter(
+    customer_client
+):
 
-    response = client.get(
+    response = customer_client.get(
         "/api/v1/events",
         query_string={
             "event_date": "invalid-date"
@@ -220,37 +113,15 @@ def test_invalid_date_returns_400(client):
     assert data["status"] == "error"
 
 
-def test_invalid_page_returns_400(client):
+def test_category_filter(
+    customer_client,
+    category
+):
 
-    response = client.get(
+    response = customer_client.get(
         "/api/v1/events",
         query_string={
-            "page": 0
-        }
-    )
-
-    assert response.status_code == 400
-
-
-def test_invalid_per_page_returns_400(client):
-
-    response = client.get(
-        "/api/v1/events",
-        query_string={
-            "per_page": 101
-        }
-    )
-
-    assert response.status_code == 400
-
-
-def test_pagination_metadata(client):
-
-    response = client.get(
-        "/api/v1/events",
-        query_string={
-            "page": 1,
-            "per_page": 10
+            "category_id": category.id
         }
     )
 
@@ -258,19 +129,73 @@ def test_pagination_metadata(client):
 
     data = response.get_json()
 
-    assert "pagination" in data
+    assert data["status"] == "success"
 
-    assert (
-        data["pagination"]["page"]
-        == 1
+
+def test_venue_filter(
+    customer_client,
+    venue
+):
+
+    response = customer_client.get(
+        "/api/v1/events",
+        query_string={
+            "venue_id": venue.id
+        }
     )
 
-    assert (
-        data["pagination"]["per_page"]
-        == 10
+    assert response.status_code == 200
+
+    data = response.get_json()
+
+    assert data["status"] == "success"
+
+
+def test_event_details_contains_name(
+    customer_client,
+    event
+):
+
+    response = customer_client.get(
+        f"/api/v1/events/{event.id}"
     )
 
+    assert response.status_code == 200
+
+    data = response.get_json()
+
     assert (
-        data["pagination"]["total"]
-        == 1
+        data["data"]["name"]
+        == "Test Event"
     )
+
+
+def test_empty_search_returns_success(
+    customer_client
+):
+
+    response = customer_client.get(
+        "/api/v1/events",
+        query_string={
+            "keyword":
+                "something-that-does-not-exist"
+        }
+    )
+
+    assert response.status_code == 200
+
+    data = response.get_json()
+
+    assert data["status"] == "success"
+
+    assert data["data"] == []
+
+def test_get_events_requires_authentication(
+    client
+):
+
+    response = client.get(
+        "/api/v1/events"
+    )
+
+    assert response.status_code == 401

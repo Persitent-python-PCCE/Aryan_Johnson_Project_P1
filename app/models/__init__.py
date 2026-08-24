@@ -8,6 +8,7 @@ from app.models.booking import Booking
 from app.models.booking_item import BookingItem
 from app.models.user_document import UserDocument
 from app.models.event_poster import EventPoster
+from app.models.payment import Payment
 
 __all__ = [
     "Role",
@@ -20,4 +21,5 @@ __all__ = [
     "BookingItem",
     "UserDocument",
     "EventPoster",
+    "Payment"
 ]

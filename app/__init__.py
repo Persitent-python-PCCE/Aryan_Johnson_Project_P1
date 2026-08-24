@@ -2,7 +2,8 @@ from flask import Flask, jsonify, request
 from dotenv import load_dotenv
 
 from app.config import Config
-from app.extensions import db, migrate
+from app.extensions import db, migrate, jwt
+from app import models
 
 from app.controllers.main_controller import main_bp
 from app.controllers.auth_controller import auth_bp
@@ -24,6 +25,7 @@ def create_app(test_config=None):
 
     db.init_app(app)
     migrate.init_app(app, db)
+    jwt.init_app(app)
 
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp)

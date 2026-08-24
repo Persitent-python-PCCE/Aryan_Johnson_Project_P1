@@ -65,3 +65,10 @@ class Booking(db.Model):
         "BookingItem",
         back_populates="booking"
     )
+
+    payment = db.relationship(
+        "Payment",
+        back_populates="booking",
+        uselist=False,
+        cascade="all, delete-orphan"
+    )

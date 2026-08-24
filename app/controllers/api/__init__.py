@@ -14,3 +14,5 @@ from app.controllers.api import seat_api
 from app.controllers.api import auth_api
 from app.controllers.api import booking_api
 from app.controllers.api import admin_api
+from app.controllers.api import payment_api
+from app.controllers.api import document_api

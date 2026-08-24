@@ -12,7 +12,9 @@ from app.repositories.user_repository import UserRepository
 class BookingService:
 
     BOOKABLE_EVENT_STATUS = "PUBLISHED"
+    PENDING_PAYMENT_STATUS = "PENDING_PAYMENT"
     CONFIRMED_STATUS = "CONFIRMED"
+    PAYMENT_FAILED_STATUS = "PAYMENT_FAILED"
     CANCELLED_STATUS = "CANCELLED"
 
     @staticmethod
@@ -107,7 +109,7 @@ class BookingService:
                 event_id=event_id,
                 booking_reference=booking_reference,
                 total_amount=total_amount,
-                status=BookingService.CONFIRMED_STATUS
+                status=BookingService.PENDING_PAYMENT_STATUS
             )
 
             # Create one booking item for every selected seat.

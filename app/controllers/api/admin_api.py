@@ -1,6 +1,12 @@
 from datetime import date, time
 
-from flask import jsonify, request, session
+from flask import jsonify, request
+
+from flask_jwt_extended import (
+    get_jwt,
+    get_jwt_identity,
+    verify_jwt_in_request
+)
 
 from app.controllers.api import api_bp
 from app.extensions import db
@@ -12,22 +18,26 @@ from app.services.event_service import EventService
 
 def require_admin():
     """
-    Ensure the request is authenticated and belongs to an admin.
+    Require a valid JWT belonging to an ADMIN user.
     """
 
-    user_id = session.get("user_id")
-    role = session.get("role")
+    verify_jwt_in_request()
 
-    if not user_id:
+    identity = get_jwt_identity()
+    claims = get_jwt()
+
+    try:
+        int(identity)
+    except (TypeError, ValueError):
         return (
             jsonify({
                 "status": "error",
-                "message": "Authentication required"
+                "message": "Invalid user identity"
             }),
             401
         )
 
-    if role != "ADMIN":
+    if claims.get("role") != "ADMIN":
         return (
             jsonify({
                 "status": "error",

@@ -6,7 +6,7 @@
 
 {% block content %}
 
-<div class="page-header">
+<div class="booking-confirmation-header">
 
     <h1>
         Booking Confirmation
@@ -19,11 +19,15 @@
 </div>
 
 
-<div class="booking-summary">
+<div class="booking-confirmation">
 
     <div class="card">
 
         <div class="card-body">
+
+            <!-- =========================================================
+                 BOOKING REFERENCE
+                 ========================================================= -->
 
             <div class="booking-reference">
 
@@ -37,6 +41,10 @@
 
             </div>
 
+
+            <!-- =========================================================
+                 BOOKING DETAILS
+                 ========================================================= -->
 
             <div class="booking-details">
 
@@ -114,6 +122,18 @@
                                 CANCELLED
                             </span>
 
+                        {% elif booking.status == "PENDING_PAYMENT" %}
+
+                            <span class="badge badge-warning">
+                                PAYMENT PENDING
+                            </span>
+
+                        {% elif booking.status == "PAYMENT_FAILED" %}
+
+                            <span class="badge badge-danger">
+                                PAYMENT FAILED
+                            </span>
+
                         {% else %}
 
                             <span class="badge badge-warning">
@@ -128,6 +148,10 @@
 
             </div>
 
+
+            <!-- =========================================================
+                 RESERVED SEATS
+                 ========================================================= -->
 
             <div style="margin-top: 30px;">
 
@@ -198,6 +222,413 @@
             </div>
 
 
+            <!-- =========================================================
+                 PAYMENT SECTION
+                 ========================================================= -->
+
+            {% if booking.status == "PENDING_PAYMENT" %}
+
+            <div
+                id="payment-section"
+                style="
+                    margin-top: 35px;
+                    padding: 28px;
+                    border: 1px solid var(--border);
+                    border-radius: 14px;
+                    background: #f8fafc;
+                "
+            >
+
+                <h2 style="
+                    margin-bottom: 8px;
+                ">
+                    Complete Payment
+                </h2>
+
+                <p style="
+                    margin-bottom: 24px;
+                    color: var(--text-light);
+                ">
+                    Complete your payment to confirm your booking.
+                </p>
+
+
+                <!-- =====================================================
+                     AMOUNT
+                     ===================================================== -->
+
+                <div
+                    style="
+                        padding: 18px;
+                        margin-bottom: 25px;
+                        border-radius: 10px;
+                        background: white;
+                        border: 1px solid var(--border);
+                    "
+                >
+
+                    <div style="
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        gap: 15px;
+                    ">
+
+                        <div>
+
+                            <div style="
+                                font-size: 14px;
+                                color: var(--text-light);
+                                margin-bottom: 5px;
+                            ">
+                                Amount to Pay
+                            </div>
+
+                            <strong style="
+                                font-size: 28px;
+                            ">
+                                ₹{{ booking.total_amount }}
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =====================================================
+                     PAYMENT METHOD
+                     ===================================================== -->
+
+                <div style="
+                    margin-bottom: 25px;
+                ">
+
+                    <label style="
+                        display: block;
+                        font-weight: 600;
+                        margin-bottom: 10px;
+                    ">
+                        Payment Method
+                    </label>
+
+
+                    <div style="
+                        display: flex;
+                        gap: 10px;
+                        flex-wrap: wrap;
+                    ">
+
+                        <button
+                            type="button"
+                            id="card-tab"
+                            class="btn btn-primary"
+                            onclick="selectPaymentMethod('CARD')"
+                        >
+                            💳 Card
+                        </button>
+
+
+                        <button
+                            type="button"
+                            id="upi-tab"
+                            class="btn btn-secondary"
+                            onclick="selectPaymentMethod('UPI')"
+                        >
+                            📱 UPI
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =====================================================
+                     CARD PAYMENT
+                     ===================================================== -->
+
+                <div id="card-payment">
+
+                    <div style="
+                        margin-bottom: 18px;
+                    ">
+
+                        <label
+                            for="card-number"
+                            style="
+                                display: block;
+                                font-weight: 600;
+                                margin-bottom: 7px;
+                            "
+                        >
+                            Card Number
+                        </label>
+
+                        <input
+                            type="text"
+                            id="card-number"
+                            class="form-control"
+                            placeholder="1234 5678 9012 3456"
+                            maxlength="19"
+                            autocomplete="off"
+                        >
+
+                        <small style="
+                            display: block;
+                            margin-top: 6px;
+                            color: var(--text-light);
+                        ">
+                            Enter any valid 16-digit demo card number.
+                        </small>
+
+                    </div>
+
+
+                    <div style="
+                        margin-bottom: 18px;
+                    ">
+
+                        <label
+                            for="card-name"
+                            style="
+                                display: block;
+                                font-weight: 600;
+                                margin-bottom: 7px;
+                            "
+                        >
+                            Name on Card
+                        </label>
+
+                        <input
+                            type="text"
+                            id="card-name"
+                            class="form-control"
+                            placeholder="Aryan Johnson"
+                            autocomplete="off"
+                        >
+
+                    </div>
+
+
+                    <div style="
+                        display: grid;
+                        grid-template-columns: 1fr 1fr;
+                        gap: 14px;
+                        margin-bottom: 20px;
+                    ">
+
+                        <div>
+
+                            <label
+                                for="card-expiry"
+                                style="
+                                    display: block;
+                                    font-weight: 600;
+                                    margin-bottom: 7px;
+                                "
+                            >
+                                Expiry
+                            </label>
+
+                            <input
+                                type="text"
+                                id="card-expiry"
+                                class="form-control"
+                                placeholder="MM/YY"
+                                maxlength="5"
+                                autocomplete="off"
+                            >
+
+                        </div>
+
+
+                        <div>
+
+                            <label
+                                for="card-cvv"
+                                style="
+                                    display: block;
+                                    font-weight: 600;
+                                    margin-bottom: 7px;
+                                "
+                            >
+                                CVV
+                            </label>
+
+                            <input
+                                type="password"
+                                id="card-cvv"
+                                class="form-control"
+                                placeholder="123"
+                                maxlength="3"
+                                autocomplete="off"
+                            >
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =====================================================
+                     UPI PAYMENT
+                     ===================================================== -->
+
+                <div
+                    id="upi-payment"
+                    style="display: none;"
+                >
+
+                    <div style="
+                        margin-bottom: 20px;
+                    ">
+
+                        <label
+                            for="upi-id"
+                            style="
+                                display: block;
+                                font-weight: 600;
+                                margin-bottom: 7px;
+                            "
+                        >
+                            UPI ID
+                        </label>
+
+                        <input
+                            type="text"
+                            id="upi-id"
+                            class="form-control"
+                            placeholder="example@upi"
+                            autocomplete="off"
+                        >
+
+                        <small style="
+                            display: block;
+                            margin-top: 6px;
+                            color: var(--text-light);
+                        ">
+                            Enter any valid demo UPI ID.
+                        </small>
+
+                    </div>
+
+
+                    <!-- QR CODE -->
+
+                    <div style="
+                        padding: 22px;
+                        text-align: center;
+                        background: white;
+                        border: 1px solid var(--border);
+                        border-radius: 10px;
+                    ">
+
+                        <div style="
+                            font-weight: 600;
+                            margin-bottom: 15px;
+                        ">
+                            Or Scan QR Code
+                        </div>
+
+
+                        <div
+                            id="qr-code"
+                            style="
+                                display: inline-block;
+                                padding: 12px;
+                                background: white;
+                                border: 1px solid #e5e7eb;
+                                border-radius: 8px;
+                            "
+                        ></div>
+
+
+                        <p style="
+                            margin-top: 14px;
+                            margin-bottom: 0;
+                            font-size: 13px;
+                            color: var(--text-light);
+                        ">
+                            Demo QR code for payment simulation.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =====================================================
+                     PAYMENT ERROR
+                     ===================================================== -->
+
+                <div
+                    id="payment-error"
+                    style="
+                        display: none;
+                        margin-top: 18px;
+                        padding: 12px 14px;
+                        border-radius: 8px;
+                        background: #fee2e2;
+                        color: #991b1b;
+                    "
+                ></div>
+
+
+                <!-- =====================================================
+                     PAY BUTTON
+                     ===================================================== -->
+
+                <button
+                    type="button"
+                    id="pay-button"
+                    class="btn btn-primary"
+                    style="
+                        width: 100%;
+                        margin-top: 20px;
+                        font-size: 16px;
+                    "
+                    onclick="payNow()"
+                >
+                    Pay ₹{{ booking.total_amount }}
+                </button>
+
+
+                <p style="
+                    margin-top: 15px;
+                    margin-bottom: 0;
+                    text-align: center;
+                    font-size: 12px;
+                    color: var(--text-light);
+                ">
+                    🔒 Demo payment gateway — no real money is charged.
+                </p>
+
+            </div>
+
+            {% endif %}
+
+
+            <!-- =========================================================
+                 PAYMENT RESULT
+                 ========================================================= -->
+
+            <div
+                id="payment-result"
+                style="
+                    display: none;
+                    margin-top: 25px;
+                    padding: 20px;
+                    border-radius: 10px;
+                "
+            ></div>
+
+
+            <!-- =========================================================
+                 FINAL ACTIONS
+                 ========================================================= -->
+
             <div class="form-actions">
 
                 <a
@@ -221,5 +652,852 @@
     </div>
 
 </div>
+
+
+<!-- =============================================================
+     PAYMENT JAVASCRIPT
+     ============================================================= -->
+
+{% if booking.status == "PENDING_PAYMENT" %}
+
+<script>
+
+/*
+ * ============================================================
+ * PAYMENT CONFIGURATION
+ * ============================================================
+ */
+
+let selectedPaymentMethod = "CARD";
+
+
+/*
+ * ============================================================
+ * COOKIE HELPER
+ * ============================================================
+ *
+ * The JWT access token itself is HttpOnly and therefore cannot
+ * be read by JavaScript.
+ *
+ * Flask-JWT-Extended exposes the CSRF token separately.
+ *
+ * We send that CSRF token in X-CSRF-TOKEN for POST requests.
+ * ============================================================
+ */
+
+function getCookie(name) {
+
+    const cookies =
+        document.cookie.split(";");
+
+    for (let cookie of cookies) {
+
+        cookie = cookie.trim();
+
+        if (
+            cookie.startsWith(
+                name + "="
+            )
+        ) {
+
+            return decodeURIComponent(
+                cookie.substring(
+                    name.length + 1
+                )
+            );
+
+        }
+
+    }
+
+    return null;
+}
+
+
+/*
+ * ============================================================
+ * PAYMENT METHOD SELECTION
+ * ============================================================
+ */
+
+function selectPaymentMethod(method) {
+
+    selectedPaymentMethod = method;
+
+
+    const cardSection =
+        document.getElementById(
+            "card-payment"
+        );
+
+    const upiSection =
+        document.getElementById(
+            "upi-payment"
+        );
+
+
+    const cardTab =
+        document.getElementById(
+            "card-tab"
+        );
+
+    const upiTab =
+        document.getElementById(
+            "upi-tab"
+        );
+
+
+    if (method === "CARD") {
+
+        cardSection.style.display =
+            "block";
+
+        upiSection.style.display =
+            "none";
+
+        cardTab.className =
+            "btn btn-primary";
+
+        upiTab.className =
+            "btn btn-secondary";
+
+    }
+
+    else {
+
+        cardSection.style.display =
+            "none";
+
+        upiSection.style.display =
+            "block";
+
+        cardTab.className =
+            "btn btn-secondary";
+
+        upiTab.className =
+            "btn btn-primary";
+
+        generateQRCode();
+
+    }
+
+}
+
+
+/*
+ * ============================================================
+ * QR CODE
+ * ============================================================
+ */
+
+function generateQRCode() {
+
+    const qrContainer =
+        document.getElementById(
+            "qr-code"
+        );
+
+
+    if (!qrContainer) {
+        return;
+    }
+
+
+    qrContainer.innerHTML = "";
+
+
+    /*
+     * This is a demonstration UPI URI.
+     *
+     * It does NOT perform a real transaction.
+     */
+
+    const upiUri =
+        "upi://pay"
+        + "?pa=ticketbooking@upi"
+        + "&pn=Event%20Booking"
+        + "&am={{ booking.total_amount }}"
+        + "&cu=INR";
+
+
+    /*
+     * QRCode.js is loaded below.
+     */
+
+    if (typeof QRCode === "undefined") {
+
+        qrContainer.innerHTML = `
+            <div style="
+                padding: 20px;
+                color: #991b1b;
+                font-size: 13px;
+            ">
+                QR code library could not be loaded.
+            </div>
+        `;
+
+        return;
+    }
+
+
+    new QRCode(
+        qrContainer,
+        {
+            text: upiUri,
+            width: 180,
+            height: 180
+        }
+    );
+
+}
+
+
+/*
+ * ============================================================
+ * PAYMENT ERROR
+ * ============================================================
+ */
+
+function showPaymentError(message) {
+
+    const errorBox =
+        document.getElementById(
+            "payment-error"
+        );
+
+
+    errorBox.textContent =
+        message;
+
+
+    errorBox.style.display =
+        "block";
+
+}
+
+
+function clearPaymentError() {
+
+    const errorBox =
+        document.getElementById(
+            "payment-error"
+        );
+
+
+    errorBox.textContent =
+        "";
+
+
+    errorBox.style.display =
+        "none";
+
+}
+
+
+/*
+ * ============================================================
+ * CARD VALIDATION
+ * ============================================================
+ */
+
+function validateCard() {
+
+    const number =
+        document.getElementById(
+            "card-number"
+        ).value.trim();
+
+
+    const name =
+        document.getElementById(
+            "card-name"
+        ).value.trim();
+
+
+    const expiry =
+        document.getElementById(
+            "card-expiry"
+        ).value.trim();
+
+
+    const cvv =
+        document.getElementById(
+            "card-cvv"
+        ).value.trim();
+
+
+    /*
+     * Remove spaces before validating.
+     */
+
+    const cleanNumber =
+        number.replace(
+            /\s/g,
+            ""
+        );
+
+
+    if (
+        !/^\d{16}$/.test(
+            cleanNumber
+        )
+    ) {
+
+        return (
+            "Enter a valid 16-digit card number."
+        );
+
+    }
+
+
+    if (!name) {
+
+        return (
+            "Enter the name on the card."
+        );
+
+    }
+
+
+    if (
+        !/^(0[1-9]|1[0-2])\/\d{2}$/.test(
+            expiry
+        )
+    ) {
+
+        return (
+            "Enter expiry in MM/YY format."
+        );
+
+    }
+
+
+    if (
+        !/^\d{3}$/.test(
+            cvv
+        )
+    ) {
+
+        return (
+            "Enter a valid 3-digit CVV."
+        );
+
+    }
+
+
+    return null;
+
+}
+
+
+/*
+ * ============================================================
+ * UPI VALIDATION
+ * ============================================================
+ */
+
+function validateUPI() {
+
+    const upi =
+        document.getElementById(
+            "upi-id"
+        ).value.trim();
+
+
+    if (
+        !/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+$/.test(
+            upi
+        )
+    ) {
+
+        return (
+            "Enter a valid UPI ID."
+        );
+
+    }
+
+
+    return null;
+
+}
+
+
+/*
+ * ============================================================
+ * CREATE PAYMENT
+ * ============================================================
+ *
+ * This creates the PENDING payment record.
+ *
+ * We send only the payment method to the backend.
+ *
+ * Card number, CVV and UPI ID are deliberately NOT sent
+ * to the backend because this is a mock gateway and our
+ * application should not store sensitive payment credentials.
+ * ============================================================
+ */
+
+async function createPayment() {
+
+    const csrfToken =
+        getCookie(
+            "csrf_access_token"
+        );
+
+
+    const response =
+        await fetch(
+            "{{ url_for('api.create_payment', booking_id=booking.id) }}",
+            {
+                method: "POST",
+
+                credentials:
+                    "same-origin",
+
+                headers: {
+
+                    "Content-Type":
+                        "application/json",
+
+                    "X-CSRF-TOKEN":
+                        csrfToken
+                },
+
+                body: JSON.stringify({
+
+                    payment_method:
+                        selectedPaymentMethod
+
+                })
+            }
+        );
+
+
+    const data =
+        await response.json();
+
+
+    if (!response.ok) {
+
+        throw new Error(
+            data.message ||
+            "Unable to initiate payment."
+        );
+
+    }
+
+
+    return data;
+
+}
+
+
+/*
+ * ============================================================
+ * PROCESS PAYMENT
+ * ============================================================
+ *
+ * In this mock gateway, valid credentials result in success.
+ * ============================================================
+ */
+
+async function processPayment() {
+
+    const csrfToken =
+        getCookie(
+            "csrf_access_token"
+        );
+
+
+    const response =
+        await fetch(
+            "{{ url_for('api.process_payment', booking_id=booking.id) }}",
+            {
+                method: "POST",
+
+                credentials:
+                    "same-origin",
+
+                headers: {
+
+                    "Content-Type":
+                        "application/json",
+
+                    "X-CSRF-TOKEN":
+                        csrfToken
+
+                },
+
+                body: JSON.stringify({
+
+                    success: true
+
+                })
+
+            }
+        );
+
+
+    const data =
+        await response.json();
+
+
+    if (!response.ok) {
+
+        throw new Error(
+            data.message ||
+            "Payment processing failed."
+        );
+
+    }
+
+
+    return data;
+
+}
+
+
+/*
+ * ============================================================
+ * MAIN PAYMENT FLOW
+ * ============================================================
+ */
+
+async function payNow() {
+
+    clearPaymentError();
+
+
+    /*
+     * Validate the selected payment method.
+     */
+
+    let validationError = null;
+
+
+    if (
+        selectedPaymentMethod ===
+        "CARD"
+    ) {
+
+        validationError =
+            validateCard();
+
+    }
+
+    else if (
+        selectedPaymentMethod ===
+        "UPI"
+    ) {
+
+        validationError =
+            validateUPI();
+
+    }
+
+
+    if (validationError) {
+
+        showPaymentError(
+            validationError
+        );
+
+        return;
+
+    }
+
+
+    const button =
+        document.getElementById(
+            "pay-button"
+        );
+
+
+    button.disabled = true;
+
+    button.textContent =
+        "Processing Payment...";
+
+
+    try {
+
+        /*
+         * =====================================================
+         * STEP 1
+         * Create payment transaction.
+         * =====================================================
+         */
+
+        await createPayment();
+
+
+        /*
+         * =====================================================
+         * STEP 2
+         * Process mock payment.
+         * =====================================================
+         */
+
+        const processData =
+            await processPayment();
+
+
+        /*
+         * =====================================================
+         * PAYMENT SUCCESS
+         * =====================================================
+         */
+
+        button.textContent =
+            "Payment Successful ✓";
+
+
+        button.disabled =
+            true;
+
+
+        const resultBox =
+            document.getElementById(
+                "payment-result"
+            );
+
+
+        resultBox.style.display =
+            "block";
+
+
+        resultBox.style.background =
+            "#dcfce7";
+
+
+        resultBox.style.color =
+            "#166534";
+
+
+        /*
+         * Try to obtain transaction reference.
+         *
+         * This supports the expected API response structure:
+         *
+         * data.payment.transaction_reference
+         *
+         * and also falls back to other possible structures.
+         */
+
+        const transactionReference =
+            processData?.data?.payment
+                ?.transaction_reference
+            ||
+            processData?.data
+                ?.transaction_reference
+            ||
+            "Generated successfully";
+
+
+        resultBox.innerHTML = `
+
+            <h3 style="
+                margin-bottom: 10px;
+            ">
+                Payment Successful ✓
+            </h3>
+
+            <p style="
+                margin-bottom: 8px;
+            ">
+                Your booking has been confirmed.
+            </p>
+
+            <p style="
+                margin-bottom: 8px;
+            ">
+                <strong>
+                    Transaction Reference:
+                </strong>
+
+                ${transactionReference}
+            </p>
+
+            <p style="
+                margin-bottom: 0;
+            ">
+                <strong>
+                    Payment Method:
+                </strong>
+
+                ${selectedPaymentMethod}
+            </p>
+
+        `;
+
+
+        /*
+         * Reload the page after a short delay.
+         *
+         * The server will now render:
+         *
+         * Booking status = CONFIRMED
+         */
+
+        setTimeout(
+            function () {
+
+                window.location.reload();
+
+            },
+            1500
+        );
+
+    }
+
+    catch (error) {
+
+        showPaymentError(
+            error.message
+        );
+
+
+        button.disabled =
+            false;
+
+
+        button.textContent =
+            "Pay ₹{{ booking.total_amount }}";
+
+    }
+
+}
+
+
+/*
+ * ============================================================
+ * CARD NUMBER FORMATTING
+ * ============================================================
+ */
+
+const cardNumberInput =
+    document.getElementById(
+        "card-number"
+    );
+
+
+if (cardNumberInput) {
+
+    cardNumberInput.addEventListener(
+        "input",
+        function () {
+
+            let value =
+                this.value.replace(
+                    /\D/g,
+                    ""
+                );
+
+
+            value =
+                value.substring(
+                    0,
+                    16
+                );
+
+
+            const groups =
+                value.match(
+                    /.{1,4}/g
+                );
+
+
+            this.value =
+                groups
+                    ? groups.join(" ")
+                    : "";
+
+        }
+    );
+
+}
+
+
+/*
+ * ============================================================
+ * EXPIRY FORMATTING
+ * ============================================================
+ */
+
+const expiryInput =
+    document.getElementById(
+        "card-expiry"
+    );
+
+
+if (expiryInput) {
+
+    expiryInput.addEventListener(
+        "input",
+        function () {
+
+            let value =
+                this.value.replace(
+                    /\D/g,
+                    ""
+                );
+
+
+            value =
+                value.substring(
+                    0,
+                    4
+                );
+
+
+            if (
+                value.length >= 3
+            ) {
+
+                value =
+                    value.substring(
+                        0,
+                        2
+                    )
+                    + "/"
+                    + value.substring(
+                        2
+                    );
+
+            }
+
+
+            this.value =
+                value;
+
+        }
+    );
+
+}
+
+
+/*
+ * ============================================================
+ * INITIAL STATE
+ * ============================================================
+ */
+
+selectPaymentMethod(
+    "CARD"
+);
+
+</script>
+
+
+<!-- =============================================================
+     QR CODE LIBRARY
+     ============================================================= -->
+
+<script
+    src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"
+></script>
+
+
+{% endif %}
 
 {% endblock %}

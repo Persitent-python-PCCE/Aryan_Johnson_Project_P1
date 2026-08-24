@@ -10,12 +10,19 @@ from flask import (
     url_for
 )
 
+from app.repositories.user_document_repository import (
+    UserDocumentRepository
+)
+
 from app.services.event_service import EventService
 from app.services.category_service import CategoryService
 from app.services.venue_service import VenueService
 from app.services.seat_service import SeatService
 from app.services.booking_service import BookingService
 from app.utils.auth import role_required
+from app.services.file_service import FileService
+
+from app.extensions import db
 
 
 customer_bp = Blueprint(
@@ -32,6 +39,220 @@ def dashboard():
         "customer/dashboard.html"
     )
 
+@customer_bp.route("/documents")
+@role_required("CUSTOMER")
+def documents():
+
+    user_id = session.get("user_id")
+
+    documents = (
+        UserDocumentRepository.get_by_user(
+            user_id
+        )
+    )
+
+    return render_template(
+        "customer/documents.html",
+        documents=documents
+    )
+
+
+@customer_bp.route(
+    "/documents/upload",
+    methods=["POST"]
+)
+@role_required("CUSTOMER")
+def upload_document():
+
+    user_id = session.get("user_id")
+
+    document_type = request.form.get(
+        "document_type",
+        ""
+    ).strip()
+
+    uploaded_file = request.files.get(
+        "file"
+    )
+
+    if not uploaded_file:
+        flash(
+            "Please select a document file.",
+            "error"
+        )
+
+        return redirect(
+            url_for("customer.documents")
+        )
+
+    if not uploaded_file.filename:
+        flash(
+            "Filename is required.",
+            "error"
+        )
+
+        return redirect(
+            url_for("customer.documents")
+        )
+
+    try:
+
+        uploaded_file.stream.seek(0)
+
+        file_size = uploaded_file.stream.seek(
+            0,
+            2
+        )
+
+        uploaded_file.stream.seek(0)
+
+        document = FileService.save_document(
+            user_id=user_id,
+            document_type=document_type,
+            filename=uploaded_file.filename,
+            file_size=file_size,
+            mime_type=uploaded_file.mimetype,
+            file_object=uploaded_file
+        )
+
+        db.session.commit()
+
+        flash(
+            "Document uploaded successfully.",
+            "success"
+        )
+
+    except ValueError as exc:
+
+        db.session.rollback()
+
+        flash(
+            str(exc),
+            "error"
+        )
+
+    except Exception:
+
+        db.session.rollback()
+
+        flash(
+            "Unable to upload document.",
+            "error"
+        )
+
+    return redirect(
+        url_for("customer.documents")
+    )
+
+
+@customer_bp.route(
+    "/documents/<int:document_id>/view"
+)
+@role_required("CUSTOMER")
+def view_document(document_id):
+
+    user_id = session.get("user_id")
+
+    document = (
+        UserDocumentRepository.get_by_id(
+            document_id
+        )
+    )
+
+    if not document:
+        flash(
+            "Document not found.",
+            "error"
+        )
+
+        return redirect(
+            url_for("customer.documents")
+        )
+
+    if document.user_id != user_id:
+        flash(
+            "You are not authorized to view this document.",
+            "error"
+        )
+
+        return redirect(
+            url_for("customer.documents")
+        )
+
+    from flask import send_file
+
+    return send_file(
+        document.file_path,
+        mimetype=document.mime_type,
+        as_attachment=False,
+        download_name=document.original_filename
+    )
+
+
+@customer_bp.route(
+    "/documents/<int:document_id>/delete",
+    methods=["POST"]
+)
+@role_required("CUSTOMER")
+def delete_document(document_id):
+
+    user_id = session.get("user_id")
+
+    document = (
+        UserDocumentRepository.get_by_id(
+            document_id
+        )
+    )
+
+    if not document:
+        flash(
+            "Document not found.",
+            "error"
+        )
+
+        return redirect(
+            url_for("customer.documents")
+        )
+
+    if document.user_id != user_id:
+        flash(
+            "You are not authorized to delete this document.",
+            "error"
+        )
+
+        return redirect(
+            url_for("customer.documents")
+        )
+
+    try:
+
+        FileService.delete_file(
+            document.file_path
+        )
+
+        UserDocumentRepository.delete(
+            document
+        )
+
+        db.session.commit()
+
+        flash(
+            "Document deleted successfully.",
+            "success"
+        )
+
+    except Exception:
+
+        db.session.rollback()
+
+        flash(
+            "Unable to delete document.",
+            "error"
+        )
+
+    return redirect(
+        url_for("customer.documents")
+    )
 
 @customer_bp.route("/events")
 @role_required("CUSTOMER")

@@ -12,7 +12,7 @@
 
     <title>
         {% block title %}
-            Ticket Booking System
+            Ticket Booking
         {% endblock %}
     </title>
 
@@ -21,131 +21,186 @@
         href="{{ url_for('static', filename='css/style.css') }}"
     >
 
+    {% block head %}{% endblock %}
+
 </head>
+
 
 <body>
 
-    {% block navbar %}
+    <header class="navbar">
 
-        <nav class="navbar">
+        <div class="nav-container">
 
-            <div class="container navbar-inner">
+            <a
+                href="{{ url_for('main.index') }}"
+                class="brand"
+            >
+                <span class="brand-mark">T</span>
+                <span>Ticket Booking</span>
+            </a>
 
-                <a
-                    href="{{ url_for('main.index') }}"
-                    class="brand"
-                >
-                    <span class="brand-mark">T</span>
-                    <span>Ticket Booking</span>
-                </a>
 
-                <div class="nav-links">
+            <div class="nav-links">
 
-                    {% if session.get("role") == "CUSTOMER" %}
+                {% if session.get("role") == "CUSTOMER" %}
 
-                        <a href="{{ url_for('customer.dashboard') }}">
-                            Dashboard
-                        </a>
+                    <a
+                        href="{{ url_for('customer.dashboard') }}"
+                    >
+                        Dashboard
+                    </a>
 
-                        <a href="{{ url_for('customer.events') }}">
-                            Events
-                        </a>
 
-                        <a href="{{ url_for('customer.bookings') }}">
-                            My Bookings
-                        </a>
+                    <a
+                        href="{{ url_for('customer.events') }}"
+                    >
+                        Events
+                    </a>
 
-                        <a href="{{ url_for('auth.logout') }}">
-                            Logout
-                        </a>
 
-                    {% elif session.get("role") == "ADMIN" %}
+                    <a
+                        href="{{ url_for('customer.bookings') }}"
+                    >
+                        My Bookings
+                    </a>
 
-                        <a href="{{ url_for('admin.dashboard') }}">
-                            Dashboard
-                        </a>
 
-                        <a href="{{ url_for('admin.categories') }}">
-                            Categories
-                        </a>
+                    <a
+                        href="{{ url_for('customer.documents') }}"
+                    >
+                        My Documents
+                    </a>
 
-                        <a href="{{ url_for('admin.venues') }}">
-                            Venues
-                        </a>
 
-                        <a href="{{ url_for('admin.events') }}">
-                            Events
-                        </a>
+                    <a
+                        href="{{ url_for('auth.logout') }}"
+                    >
+                        Logout
+                    </a>
 
-                        <a href="{{ url_for('admin.bookings') }}">
-                            Bookings
-                        </a>
 
-                        <a href="{{ url_for('auth.logout') }}">
-                            Logout
-                        </a>
+                {% elif session.get("role") == "ADMIN" %}
 
-                    {% else %}
+                    <a
+                        href="{{ url_for('admin.dashboard') }}"
+                    >
+                        Dashboard
+                    </a>
 
-                        <a href="{{ url_for('auth.login') }}">
-                            Login
-                        </a>
 
-                        <a href="{{ url_for('auth.register') }}">
-                            Register
-                        </a>
+                    <a
+                        href="{{ url_for('admin.categories') }}"
+                    >
+                        Categories
+                    </a>
 
-                    {% endif %}
 
-                </div>
+                    <a
+                        href="{{ url_for('admin.venues') }}"
+                    >
+                        Venues
+                    </a>
+
+
+                    <a
+                        href="{{ url_for('admin.events') }}"
+                    >
+                        Events
+                    </a>
+
+
+                    <a
+                        href="{{ url_for('admin.bookings') }}"
+                    >
+                        Bookings
+                    </a>
+
+
+                    <a
+                        href="{{ url_for('auth.logout') }}"
+                    >
+                        Logout
+                    </a>
+
+
+                {% else %}
+
+                    <a
+                        href="{{ url_for('main.index') }}"
+                    >
+                        Home
+                    </a>
+
+
+                    <a
+                        href="{{ url_for('auth.login') }}"
+                    >
+                        Login
+                    </a>
+
+
+                    <a
+                        href="{{ url_for('auth.register') }}"
+                    >
+                        Register
+                    </a>
+
+                {% endif %}
 
             </div>
 
-        </nav>
+        </div>
 
-    {% endblock %}
+    </header>
 
 
-    <main>
+    <main class="main-content">
 
-        <div class="container page">
+        {% with messages = get_flashed_messages(
+            with_categories=true
+        ) %}
 
-            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
 
-                {% if messages %}
+                <div class="flash-container">
 
                     {% for category, message in messages %}
 
-                        <div class="alert alert-{{ category }}">
+                        <div
+                            class="flash-message flash-{{ category }}"
+                        >
                             {{ message }}
                         </div>
 
                     {% endfor %}
 
-                {% endif %}
+                </div>
 
-            {% endwith %}
+            {% endif %}
+
+        {% endwith %}
 
 
-            {% block content %}
-            {% endblock %}
-
-        </div>
+        {% block content %}{% endblock %}
 
     </main>
 
 
     <footer class="footer">
 
-        <div class="container">
+        <div class="footer-container">
 
-            Online Ticket Booking System
-            · Flask REST API
-            · {{ current_year if current_year else "" }}
+            <p>
+                &copy; 2026 Ticket Booking System
+            </p>
 
         </div>
 
     </footer>
+
+
+    {% block scripts %}{% endblock %}
 
 </body>
 
