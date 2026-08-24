@@ -18,7 +18,10 @@
 
     <link
         rel="stylesheet"
-        href="{{ url_for('static', filename='css/style.css') }}"
+        href="{{ url_for(
+            'static',
+            filename='css/style.css'
+        ) }}"
     >
 
     {% block head %}{% endblock %}
@@ -28,6 +31,10 @@
 
 <body>
 
+    <!-- =========================================================
+         NAVBAR
+         ========================================================= -->
+
     <header class="navbar">
 
         <div class="nav-container">
@@ -36,8 +43,15 @@
                 href="{{ url_for('main.index') }}"
                 class="brand"
             >
-                <span class="brand-mark">T</span>
-                <span>Ticket Booking</span>
+
+                <span class="brand-mark">
+                    T
+                </span>
+
+                <span>
+                    Ticket Booking
+                </span>
+
             </a>
 
 
@@ -155,7 +169,16 @@
     </header>
 
 
+    <!-- =========================================================
+         MAIN CONTENT
+         ========================================================= -->
+
     <main class="main-content">
+
+
+        <!-- =====================================================
+             FLASH NOTIFICATIONS
+             ===================================================== -->
 
         {% with messages = get_flashed_messages(
             with_categories=true
@@ -163,14 +186,82 @@
 
             {% if messages %}
 
-                <div class="flash-container">
+                <div
+                    class="flash-container"
+                    aria-live="polite"
+                >
 
                     {% for category, message in messages %}
 
                         <div
-                            class="flash-message flash-{{ category }}"
+                            class="
+                                flash-message
+                                flash-{{ category }}
+                            "
+                            role="alert"
                         >
-                            {{ message }}
+
+                            <div class="flash-content">
+
+                                {% if category == "success" %}
+
+                                    <span
+                                        class="flash-icon"
+                                        aria-hidden="true"
+                                    >
+                                        ✓
+                                    </span>
+
+                                {% elif category == "danger" %}
+
+                                    <span
+                                        class="flash-icon"
+                                        aria-hidden="true"
+                                    >
+                                        !
+                                    </span>
+
+                                {% elif category == "warning" %}
+
+                                    <span
+                                        class="flash-icon"
+                                        aria-hidden="true"
+                                    >
+                                        ⚠
+                                    </span>
+
+                                {% else %}
+
+                                    <span
+                                        class="flash-icon"
+                                        aria-hidden="true"
+                                    >
+                                        i
+                                    </span>
+
+                                {% endif %}
+
+
+                                <span class="flash-text">
+                                    {{ message }}
+                                </span>
+
+                            </div>
+
+
+                            <button
+                                type="button"
+                                class="flash-close"
+                                aria-label="Close notification"
+                                onclick="
+                                    this.closest(
+                                        '.flash-message'
+                                    ).remove()
+                                "
+                            >
+                                ×
+                            </button>
+
                         </div>
 
                     {% endfor %}
@@ -182,10 +273,18 @@
         {% endwith %}
 
 
+        <!-- =====================================================
+             PAGE CONTENT
+             ===================================================== -->
+
         {% block content %}{% endblock %}
 
     </main>
 
+
+    <!-- =========================================================
+         FOOTER
+         ========================================================= -->
 
     <footer class="footer">
 
@@ -200,7 +299,80 @@
     </footer>
 
 
+    <!-- =========================================================
+         PAGE-SPECIFIC SCRIPTS
+         ========================================================= -->
+
     {% block scripts %}{% endblock %}
+
+
+    <!-- =========================================================
+         FLASH NOTIFICATION BEHAVIOR
+         ========================================================= -->
+
+    <script>
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
+
+                const notifications =
+                    document.querySelectorAll(
+                        ".flash-message"
+                    );
+
+
+                notifications.forEach(
+                    function (notification) {
+
+                        /*
+                         * Success and informational messages
+                         * disappear automatically.
+                         *
+                         * Error/warning messages remain visible
+                         * until the user closes them.
+                         */
+
+                        if (
+                            notification.classList.contains(
+                                "flash-success"
+                            )
+                            ||
+                            notification.classList.contains(
+                                "flash-info"
+                            )
+                        ) {
+
+                            setTimeout(
+                                function () {
+
+                                    notification.classList.add(
+                                        "flash-hiding"
+                                    );
+
+
+                                    setTimeout(
+                                        function () {
+
+                                            notification.remove();
+
+                                        },
+                                        250
+                                    );
+
+                                },
+                                4500
+                            );
+
+                        }
+
+                    }
+                );
+
+            }
+        );
+
+    </script>
 
 </body>
 

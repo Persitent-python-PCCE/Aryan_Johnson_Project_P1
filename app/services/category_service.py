@@ -55,3 +55,19 @@ class CategoryService:
         category = CategoryService.get_category(category_id)
 
         CategoryRepository.delete(category)
+
+    @staticmethod
+    def delete_category(category_id):
+        category = CategoryRepository.get_by_id(category_id)
+
+        if not category:
+            raise ValueError("Category not found")
+
+        if CategoryRepository.has_events(category_id):
+            raise ValueError(
+                "Cannot delete this category because events are using it."
+            )
+
+        CategoryRepository.delete(category)
+
+        return category

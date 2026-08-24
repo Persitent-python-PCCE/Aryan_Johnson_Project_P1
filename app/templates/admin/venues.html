@@ -50,9 +50,11 @@
                         <th>Venue</th>
                         <th>Location</th>
                         <th>Capacity</th>
+                        <th>Actions</th>
                     </tr>
 
                 </thead>
+
 
                 <tbody>
 
@@ -64,6 +66,7 @@
                                 #{{ venue.id }}
                             </td>
 
+
                             <td>
 
                                 <strong>
@@ -71,6 +74,7 @@
                                 </strong>
 
                             </td>
+
 
                             <td>
 
@@ -84,11 +88,37 @@
 
                             </td>
 
+
                             <td>
 
                                 <span class="capacity-badge">
                                     {{ venue.capacity }} seats
                                 </span>
+
+                            </td>
+
+
+                            <td>
+
+                                <form
+                                    method="POST"
+                                    action="{{ url_for(
+                                        'admin.delete_venue',
+                                        venue_id=venue.id
+                                    ) }}"
+                                    onsubmit="return confirm(
+                                        'Are you sure you want to delete this venue?'
+                                    );"
+                                >
+
+                                    <button
+                                        type="submit"
+                                        class="btn btn-danger btn-small"
+                                    >
+                                        Delete
+                                    </button>
+
+                                </form>
 
                             </td>
 
@@ -110,13 +140,16 @@
                 V
             </div>
 
+
             <h3>
                 No venues yet
             </h3>
 
+
             <p>
                 Add a venue before creating events.
             </p>
+
 
             <a
                 href="{{ url_for('admin.create_venue') }}"

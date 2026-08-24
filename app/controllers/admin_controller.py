@@ -1,7 +1,10 @@
 from app.extensions import db
 from datetime import date, time
+import os
 
-from app.extensions import db
+from app.config import Config
+from app.services.file_service import FileService
+from app.repositories.event_poster_repository import EventPosterRepository
 
 from app.services.event_service import EventService
 from app.services.category_service import CategoryService
@@ -107,6 +110,44 @@ def create_category():
         db.session.rollback()
         raise
 
+@admin_bp.route(
+    "/categories/<int:category_id>/delete",
+    methods=["POST"]
+)
+@role_required("ADMIN")
+def delete_category(category_id):
+
+    try:
+
+        CategoryService.delete_category(
+            category_id
+        )
+
+        db.session.commit()
+
+        flash(
+            "Category deleted successfully.",
+            "success"
+        )
+
+    except ValueError as exc:
+
+        db.session.rollback()
+
+        flash(
+            str(exc),
+            "danger"
+        )
+
+    except Exception:
+
+        db.session.rollback()
+        raise
+
+    return redirect(
+        url_for("admin.categories")
+    )
+
 
 # ---------------------------------------------------------------------------
 # Venues
@@ -191,6 +232,44 @@ def create_venue():
         db.session.rollback()
         raise
 
+@admin_bp.route(
+    "/venues/<int:venue_id>/delete",
+    methods=["POST"]
+)
+@role_required("ADMIN")
+def delete_venue(venue_id):
+
+    try:
+
+        VenueService.delete_venue(
+            venue_id
+        )
+
+        db.session.commit()
+
+        flash(
+            "Venue deleted successfully.",
+            "success"
+        )
+
+    except ValueError as exc:
+
+        db.session.rollback()
+
+        flash(
+            str(exc),
+            "danger"
+        )
+
+    except Exception:
+
+        db.session.rollback()
+        raise
+
+    return redirect(
+        url_for("admin.venues")
+    )
+
 
 # ---------------------------------------------------------------------------
 # Events
@@ -210,7 +289,10 @@ def events():
     )
 
 
-@admin_bp.route("/events/create", methods=["GET", "POST"])
+@admin_bp.route(
+    "/events/create",
+    methods=["GET", "POST"]
+)
 @role_required("ADMIN")
 def create_event():
 
@@ -221,6 +303,7 @@ def create_event():
     venues = VenueService.get_venues()
 
     if request.method == "GET":
+
         return render_template(
             "admin/event_form.html",
             categories=categories,
@@ -228,6 +311,7 @@ def create_event():
         )
 
     try:
+
         name = request.form.get(
             "name",
             ""
@@ -261,9 +345,36 @@ def create_event():
         status = request.form.get(
             "status",
             "DRAFT"
+        ).strip().upper()
+
+
+        # ----------------------------------------------------
+        # Poster
+        # ----------------------------------------------------
+
+        poster = request.files.get(
+            "poster"
         )
 
-        EventService.create_event(
+
+        # ----------------------------------------------------
+        # Poster required for published events
+        # ----------------------------------------------------
+
+        if status == "PUBLISHED":
+
+            if not poster or not poster.filename:
+
+                raise ValueError(
+                    "A poster is required for published events"
+                )
+
+
+        # ----------------------------------------------------
+        # Create event
+        # ----------------------------------------------------
+
+        event = EventService.create_event(
             category_id=category_id,
             venue_id=venue_id,
             name=name,
@@ -274,7 +385,34 @@ def create_event():
             status=status
         )
 
+
+        # ----------------------------------------------------
+        # Save poster
+        # ----------------------------------------------------
+
+        if poster and poster.filename:
+
+            poster.stream.seek(0, 2)
+
+            file_size = poster.stream.tell()
+
+            poster.stream.seek(0)
+
+            FileService.save_poster(
+                event_id=event.id,
+                filename=poster.filename,
+                file_size=file_size,
+                mime_type=poster.mimetype,
+                file_object=poster
+            )
+
+
+        # ----------------------------------------------------
+        # Commit event + poster
+        # ----------------------------------------------------
+
         db.session.commit()
+
 
         flash(
             "Event created successfully.",
@@ -284,6 +422,7 @@ def create_event():
         return redirect(
             url_for("admin.events")
         )
+
 
     except ValueError as exc:
 
@@ -300,11 +439,50 @@ def create_event():
             venues=venues
         )
 
+
     except Exception:
 
         db.session.rollback()
 
         raise
+
+@admin_bp.route(
+    "/events/<int:event_id>/delete",
+    methods=["POST"]
+)
+@role_required("ADMIN")
+def delete_event(event_id):
+
+    try:
+
+        EventService.delete_event(
+            event_id
+        )
+
+        db.session.commit()
+
+        flash(
+            "Event deleted successfully.",
+            "success"
+        )
+
+    except ValueError as exc:
+
+        db.session.rollback()
+
+        flash(
+            str(exc),
+            "danger"
+        )
+
+    except Exception:
+
+        db.session.rollback()
+        raise
+
+    return redirect(
+        url_for("admin.events")
+    )
 
 
 @admin_bp.route(
@@ -413,6 +591,161 @@ def edit_event(event_id):
 
         db.session.rollback()
         raise
+
+
+@admin_bp.route(
+    "/events/<int:event_id>/poster",
+    methods=["POST"]
+)
+@role_required("ADMIN")
+def upload_event_poster(event_id):
+
+    try:
+
+        # --------------------------------------------------------
+        # Verify event exists
+        # --------------------------------------------------------
+
+        event = EventService.get_event(
+            event_id
+        )
+
+        uploaded_file = request.files.get(
+            "poster"
+        )
+
+        if not uploaded_file:
+            flash(
+                "Please select a poster image.",
+                "danger"
+            )
+
+            return redirect(
+                url_for(
+                    "admin.edit_event",
+                    event_id=event_id
+                )
+            )
+
+        if not uploaded_file.filename:
+            flash(
+                "Poster filename is required.",
+                "danger"
+            )
+
+            return redirect(
+                url_for(
+                    "admin.edit_event",
+                    event_id=event_id
+                )
+            )
+
+        # --------------------------------------------------------
+        # Calculate file size
+        # --------------------------------------------------------
+
+        uploaded_file.stream.seek(0)
+
+        file_size = uploaded_file.stream.seek(
+            0,
+            2
+        )
+
+        uploaded_file.stream.seek(0)
+
+        # --------------------------------------------------------
+        # Save poster
+        # --------------------------------------------------------
+
+        poster = FileService.save_poster(
+            event_id=event_id,
+            filename=uploaded_file.filename,
+            file_size=file_size,
+            mime_type=uploaded_file.mimetype,
+            file_object=uploaded_file
+        )
+
+        db.session.commit()
+
+        flash(
+            "Event poster uploaded successfully.",
+            "success"
+        )
+
+        return redirect(
+            url_for(
+                "admin.edit_event",
+                event_id=event_id
+            )
+        )
+
+    except ValueError as exc:
+
+        db.session.rollback()
+
+        flash(
+            str(exc),
+            "danger"
+        )
+
+        return redirect(
+            url_for(
+                "admin.edit_event",
+                event_id=event_id
+            )
+        )
+
+    except Exception:
+
+        db.session.rollback()
+
+        flash(
+            "Unable to upload event poster.",
+            "danger"
+        )
+
+        return redirect(
+            url_for(
+                "admin.edit_event",
+                event_id=event_id
+            )
+        )
+
+
+@admin_bp.route(
+    "/events/<int:event_id>/poster"
+)
+@role_required("ADMIN")
+def event_poster(event_id):
+
+    event = EventService.get_event(
+        event_id
+    )
+
+    posters = EventPosterRepository.get_by_event(
+        event.id
+    )
+
+    if not posters:
+        return (
+            "Poster not found",
+            404
+        )
+
+    poster = posters[0]
+
+    if not os.path.exists(poster.file_path):
+        return (
+            "Poster file not found",
+            404
+        )
+
+    from flask import send_file
+
+    return send_file(
+        poster.file_path,
+        mimetype=poster.mime_type
+    )
 
 
 # ---------------------------------------------------------------------------

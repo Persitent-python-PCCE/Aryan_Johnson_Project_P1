@@ -6,222 +6,867 @@
 
 {% block content %}
 
-<div class="page-header page-header-row">
+<div class="page-header">
 
-    <div>
+    <h1>
+        Explore Events
+    </h1>
 
-        <span class="eyebrow">
-            MANAGEMENT
-        </span>
-
-        <h1>
-            Events
-        </h1>
-
-        <p class="page-subtitle">
-            Create and manage events available on the platform.
-        </p>
-
-    </div>
-
-
-    <a
-        href="{{ url_for('admin.create_event') }}"
-        class="btn btn-primary"
-    >
-        + Create Event
-    </a>
+    <p>
+        Find events, explore available seats, and book your tickets.
+    </p>
 
 </div>
 
 
-<div class="admin-table-card">
+<!-- =========================================================
+     SEARCH / FILTERS
+     ========================================================= -->
 
-    {% if events.items %}
+<div class="card event-filter-card">
 
-        <div class="table-wrapper">
+    <div class="card-body">
 
-            <table class="data-table">
+        <form
+            method="GET"
+            action="{{ url_for('admin.events') }}"
+        >
 
-                <thead>
+            <div class="event-filter-grid">
 
-                    <tr>
-                        <th>Event</th>
-                        <th>Date</th>
-                        <th>Time</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
+                <div class="form-group">
 
-                </thead>
+                    <label for="keyword">
+                        Search
+                    </label>
 
-                <tbody>
+                    <input
+                        type="text"
+                        id="keyword"
+                        name="keyword"
+                        class="form-control"
+                        placeholder="Search events..."
+                        value="{{ keyword or '' }}"
+                    >
 
-                    {% for event in events.items %}
-
-                        <tr>
-
-                            <td>
-
-                                <strong>
-                                    {{ event.name }}
-                                </strong>
-
-                                <span class="table-secondary">
-                                    Event #{{ event.id }}
-                                </span>
-
-                            </td>
+                </div>
 
 
-                            <td>
-                                {{ event.event_date }}
-                            </td>
+                <div class="form-group">
 
+                    <label for="category_id">
+                        Category
+                    </label>
 
-                            <td>
+                    <select
+                        id="category_id"
+                        name="category_id"
+                        class="form-control"
+                    >
 
-                                {{ event.start_time }}
+                        <option value="">
+                            All Categories
+                        </option>
 
-                                <span class="table-secondary">
-                                    to {{ event.end_time }}
-                                </span>
+                        {% for category in categories %}
 
-                            </td>
-
-
-                            <td>
-
-                                {% if event.status == "PUBLISHED" %}
-
-                                    <span class="status-badge status-success">
-                                        Published
-                                    </span>
-
-                                {% elif event.status == "DRAFT" %}
-
-                                    <span class="status-badge status-warning">
-                                        Draft
-                                    </span>
-
-                                {% elif event.status == "CANCELLED" %}
-
-                                    <span class="status-badge status-danger">
-                                        Cancelled
-                                    </span>
-
-                                {% elif event.status == "COMPLETED" %}
-
-                                    <span class="status-badge status-neutral">
-                                        Completed
-                                    </span>
-
-                                {% else %}
-
-                                    <span class="status-badge status-neutral">
-                                        {{ event.status }}
-                                    </span>
-
+                            <option
+                                value="{{ category.id }}"
+                                {% if selected_category == category.id %}
+                                    selected
                                 {% endif %}
+                            >
+                                {{ category.name }}
+                            </option>
 
-                            </td>
+                        {% endfor %}
 
+                    </select>
 
-                            <td>
-
-                                <a
-                                    href="{{ url_for(
-                                        'admin.edit_event',
-                                        event_id=event.id
-                                    ) }}"
-                                    class="table-action"
-                                >
-                                    Edit
-                                </a>
-
-                            </td>
-
-                        </tr>
-
-                    {% endfor %}
-
-                </tbody>
-
-            </table>
-
-        </div>
+                </div>
 
 
-        {% if events.pages > 1 %}
+                <div class="form-group">
 
-            <div class="pagination">
+                    <label for="venue_id">
+                        Venue
+                    </label>
 
-                {% if events.has_prev %}
-
-                    <a
-                        href="{{ url_for(
-                            'admin.events',
-                            page=events.prev_num
-                        ) }}"
-                        class="pagination-link"
+                    <select
+                        id="venue_id"
+                        name="venue_id"
+                        class="form-control"
                     >
-                        ← Previous
-                    </a>
+
+                        <option value="">
+                            All Venues
+                        </option>
+
+                        {% for venue in venues %}
+
+                            <option
+                                value="{{ venue.id }}"
+                                {% if selected_venue == venue.id %}
+                                    selected
+                                {% endif %}
+                            >
+                                {{ venue.name }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="event_date">
+                        Date
+                    </label>
+
+                    <input
+                        type="date"
+                        id="event_date"
+                        name="event_date"
+                        class="form-control"
+                        value="{{ selected_date or '' }}"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="event-filter-actions">
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                >
+                    Search Events
+                </button>
+
+                <a
+                    href="{{ url_for('admin.events') }}"
+                    class="btn btn-secondary"
+                >
+                    Clear Filters
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     EVENTS
+     ========================================================= -->
+
+{% if events.items %}
+
+    <div class="events-grid">
+
+        {% for event in events.items %}
+
+            <div class="card event-card">
+
+                <!-- =================================================
+                     POSTER
+                     ================================================= -->
+
+                {% if event.posters %}
+
+                    <div class="event-card-poster">
+
+                        <img
+                            src="{{ url_for(
+                                'admin.event_poster',
+                                event_id=event.id
+                            ) }}"
+                            alt="{{ event.name }} poster"
+                        >
+
+                    </div>
+
+                {% else %}
+
+                    <div class="event-card-poster event-card-poster-placeholder">
+
+                        <div>
+                            <span class="poster-placeholder-icon">
+                                T
+                            </span>
+
+                            <span>
+                                Event Poster
+                            </span>
+                        </div>
+
+                    </div>
 
                 {% endif %}
 
 
-                <span class="pagination-current">
-                    Page {{ events.page }} of {{ events.pages }}
-                </span>
+                <!-- =================================================
+                     EVENT CONTENT
+                     ================================================= -->
+
+                <div class="card-body">
+
+                    <div class="event-card-header">
+
+                        <div>
+
+                            <h2 class="event-card-title">
+                                {{ event.name }}
+                            </h2>
+
+                            {% if event.category %}
+
+                                <span class="event-category">
+                                    {{ event.category.name }}
+                                </span>
+
+                            {% endif %}
+
+                        </div>
 
 
-                {% if events.has_next %}
+                        <span class="badge badge-success">
+                            {{ event.status }}
+                        </span>
 
-                    <a
-                        href="{{ url_for(
-                            'admin.events',
-                            page=events.next_num
-                        ) }}"
-                        class="pagination-link"
-                    >
-                        Next →
-                    </a>
+                    </div>
 
-                {% endif %}
+
+                    {% if event.description %}
+
+                        <p class="event-description">
+
+                            {{ event.description|truncate(150) }}
+
+                        </p>
+
+                    {% endif %}
+
+
+                    <!-- =============================================
+                         EVENT DETAILS
+                         ============================================= -->
+
+                    <div class="event-info">
+
+                        <div class="event-info-row">
+
+                            <span class="event-info-label">
+                                Date
+                            </span>
+
+                            <span class="event-info-value">
+                                {{ event.event_date }}
+                            </span>
+
+                        </div>
+
+
+                        <div class="event-info-row">
+
+                            <span class="event-info-label">
+                                Time
+                            </span>
+
+                            <span class="event-info-value">
+                                {{ event.start_time }}
+                                -
+                                {{ event.end_time }}
+                            </span>
+
+                        </div>
+
+
+                        {% if event.venue %}
+
+                            <div class="event-info-row">
+
+                                <span class="event-info-label">
+                                    Venue
+                                </span>
+
+                                <span class="event-info-value">
+                                    {{ event.venue.name }}
+                                </span>
+
+                            </div>
+
+
+                            <div class="event-info-row">
+
+                                <span class="event-info-label">
+                                    Location
+                                </span>
+
+                                <span class="event-info-value">
+                                    {{ event.venue.city }}
+                                </span>
+
+                            </div>
+
+                        {% endif %}
+
+
+                        <!-- =========================================
+                             SEAT AVAILABILITY
+                             ========================================= -->
+
+                        {% if seat_summary and event.id in seat_summary %}
+
+                            <div class="event-info-row">
+
+                                <span class="event-info-label">
+                                    Seats Available
+                                </span>
+
+                                <span class="event-info-value">
+
+                                    {% set available =
+                                        seat_summary[event.id].get(
+                                            "available",
+                                            seat_summary[event.id]
+                                        )
+                                    %}
+
+                                    {{ available }}
+
+                                </span>
+
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- =============================================
+                         ACTIONS
+                         ============================================= -->
+
+                    <div class="event-card-actions">
+
+    <a
+        href="{{ url_for(
+            'admin.edit_event',
+            event_id=event.id
+        ) }}"
+        class="btn btn-secondary"
+    >
+        Edit Event
+    </a>
+
+
+    <form
+        method="POST"
+        action="{{ url_for(
+            'admin.delete_event',
+            event_id=event.id
+        ) }}"
+        onsubmit="return confirm(
+            'Are you sure you want to delete this event? This cannot be undone.'
+        );"
+        style="display: inline;"
+    >
+
+        <button
+            type="submit"
+            class="btn btn-danger"
+        >
+            Delete Event
+        </button>
+
+    </form>
+
+</div>
+
+                </div>
 
             </div>
 
-        {% endif %}
+        {% endfor %}
 
-    {% else %}
+    </div>
 
-        <div class="empty-state">
 
-            <div class="empty-state-icon">
-                E
-            </div>
+    <!-- =========================================================
+         PAGINATION
+         ========================================================= -->
 
-            <h3>
-                No events found
-            </h3>
+    {% if events.pages > 1 %}
 
-            <p>
-                Create your first event to make it available
-                to customers.
-            </p>
+        <div class="pagination">
 
-            <a
-                href="{{ url_for('admin.create_event') }}"
-                class="btn btn-primary"
-            >
-                Create Event
-            </a>
+            {% if events.has_prev %}
+
+                <a
+                    href="{{ url_for(
+                        'admin.events',
+                        page=events.prev_num,
+                        keyword=keyword,
+                        category_id=selected_category,
+                        venue_id=selected_venue,
+                        event_date=selected_date
+                    ) }}"
+                    class="pagination-link"
+                >
+                    ← Previous
+                </a>
+
+            {% endif %}
+
+
+            <span class="pagination-info">
+
+                Page
+                {{ events.page }}
+                of
+                {{ events.pages }}
+
+            </span>
+
+
+            {% if events.has_next %}
+
+                <a
+                    href="{{ url_for(
+                        'admin.events',
+                        page=events.next_num,
+                        keyword=keyword,
+                        category_id=selected_category,
+                        venue_id=selected_venue,
+                        event_date=selected_date
+                    ) }}"
+                    class="pagination-link"
+                >
+                    Next →
+                </a>
+
+            {% endif %}
 
         </div>
 
     {% endif %}
 
-</div>
+
+{% else %}
+
+    <!-- =========================================================
+         EMPTY STATE
+         ========================================================= -->
+
+    <div class="card">
+
+        <div class="card-body">
+
+            <div class="empty-state">
+
+                <h2>
+                    No Events Found
+                </h2>
+
+                <p>
+                    There are no events matching your current filters.
+                </p>
+
+                <a
+                    href="{{ url_for('admin.events') }}"
+                    class="btn btn-primary"
+                >
+                    View All Events
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+{% endif %}
+
+
+{% endblock %}
+
+
+{% block head %}
+
+<style>
+
+    /* =========================================================
+       EVENT FILTERS
+       ========================================================= */
+
+    .event-filter-card {
+        margin-bottom: 30px;
+    }
+
+
+    .event-filter-grid {
+        display: grid;
+        grid-template-columns:
+            minmax(220px, 2fr)
+            minmax(170px, 1fr)
+            minmax(170px, 1fr)
+            minmax(170px, 1fr);
+
+        gap: 18px;
+
+        align-items: end;
+    }
+
+
+    .event-filter-actions {
+        display: flex;
+        gap: 12px;
+
+        margin-top: 20px;
+    }
+
+
+    /* =========================================================
+       EVENTS GRID
+       ========================================================= */
+
+    .events-grid {
+        display: grid;
+
+        grid-template-columns:
+            repeat(
+                auto-fit,
+                minmax(320px, 1fr)
+            );
+
+        gap: 28px;
+
+        width: 100%;
+    }
+
+
+    .event-card {
+        overflow: hidden;
+
+        display: flex;
+        flex-direction: column;
+
+        height: 100%;
+    }
+
+
+    /* =========================================================
+       POSTER
+       ========================================================= */
+
+    .event-card-poster {
+        width: 100%;
+        height: 230px;
+
+        overflow: hidden;
+
+        background: #f1f5f9;
+    }
+
+
+    .event-card-poster img {
+        display: block;
+
+        width: 100%;
+        height: 100%;
+
+        object-fit: cover;
+
+        transition:
+            transform 0.25s ease;
+    }
+
+
+    .event-card:hover
+    .event-card-poster img {
+        transform: scale(1.03);
+    }
+
+
+    .event-card-poster-placeholder {
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        color: var(--text-light);
+
+        font-size: 14px;
+    }
+
+
+    .event-card-poster-placeholder > div {
+        display: flex;
+
+        flex-direction: column;
+
+        align-items: center;
+
+        gap: 10px;
+    }
+
+
+    .poster-placeholder-icon {
+        width: 44px;
+        height: 44px;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 50%;
+
+        background: var(--primary);
+        color: white;
+
+        font-weight: 700;
+        font-size: 18px;
+    }
+
+
+    /* =========================================================
+       EVENT CONTENT
+       ========================================================= */
+
+    .event-card .card-body {
+        display: flex;
+        flex-direction: column;
+
+        flex: 1;
+    }
+
+
+    .event-card-header {
+        display: flex;
+
+        justify-content: space-between;
+        align-items: flex-start;
+
+        gap: 15px;
+
+        margin-bottom: 14px;
+    }
+
+
+    .event-card-title {
+        margin: 0 0 7px;
+
+        font-size: 21px;
+        line-height: 1.3;
+    }
+
+
+    .event-category {
+        display: inline-block;
+
+        font-size: 12px;
+        font-weight: 600;
+
+        color: var(--primary);
+
+        background: rgba(
+            37,
+            99,
+            235,
+            0.08
+        );
+
+        padding: 4px 9px;
+
+        border-radius: 5px;
+    }
+
+
+    .event-description {
+        color: var(--text-light);
+
+        font-size: 14px;
+        line-height: 1.6;
+
+        margin: 0 0 20px;
+    }
+
+
+    /* =========================================================
+       EVENT INFORMATION
+       ========================================================= */
+
+    .event-info {
+        border-top: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+
+        padding: 14px 0;
+
+        margin-bottom: 20px;
+    }
+
+
+    .event-info-row {
+        display: flex;
+
+        justify-content: space-between;
+        align-items: center;
+
+        gap: 20px;
+
+        padding: 7px 0;
+
+        font-size: 13px;
+    }
+
+
+    .event-info-label {
+        color: var(--text-light);
+
+        font-weight: 500;
+    }
+
+
+    .event-info-value {
+        text-align: right;
+
+        font-weight: 600;
+    }
+
+
+    /* =========================================================
+       ACTIONS
+       ========================================================= */
+
+    .event-card-actions {
+        display: flex;
+
+        gap: 10px;
+
+        margin-top: auto;
+    }
+
+
+    .event-card-actions .btn {
+        flex: 1;
+
+        text-align: center;
+    }
+
+
+    /* =========================================================
+       PAGINATION
+       ========================================================= */
+
+    .pagination {
+        display: flex;
+
+        justify-content: center;
+        align-items: center;
+
+        gap: 20px;
+
+        margin-top: 35px;
+    }
+
+
+    .pagination-link {
+        display: inline-flex;
+
+        align-items: center;
+        justify-content: center;
+
+        padding: 9px 15px;
+
+        border: 1px solid var(--border);
+        border-radius: 7px;
+
+        color: var(--text);
+        background: white;
+
+        text-decoration: none;
+
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+
+    .pagination-link:hover {
+        border-color: var(--primary);
+
+        color: var(--primary);
+    }
+
+
+    .pagination-info {
+        color: var(--text-light);
+
+        font-size: 13px;
+    }
+
+
+    /* =========================================================
+       RESPONSIVE
+       ========================================================= */
+
+    @media (max-width: 1000px) {
+
+        .event-filter-grid {
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+        }
+
+    }
+
+
+    @media (max-width: 650px) {
+
+        .event-filter-grid {
+            grid-template-columns: 1fr;
+        }
+
+
+        .event-filter-actions {
+            flex-direction: column;
+        }
+
+
+        .event-filter-actions .btn {
+            width: 100%;
+        }
+
+
+        .events-grid {
+            grid-template-columns: 1fr;
+        }
+
+
+        .event-card-header {
+            flex-direction: column;
+        }
+
+
+        .event-card-actions {
+            flex-direction: column;
+        }
+
+
+        .event-card-actions .btn {
+            width: 100%;
+        }
+
+    }
+
+</style>
 
 {% endblock %}

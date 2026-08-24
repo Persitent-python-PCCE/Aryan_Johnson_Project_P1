@@ -1,5 +1,6 @@
 from app.extensions import db
 from app.models.event import Event
+from app.models.booking import Booking
 
 
 class EventRepository:
@@ -121,6 +122,17 @@ class EventRepository:
                 per_page=per_page,
                 error_out=False
             )
+        )
+
+    @staticmethod
+    def has_bookings(event_id):
+        return (
+            db.session.query(Booking.id)
+            .filter(
+                Booking.event_id == event_id
+            )
+            .first()
+            is not None
         )
 
     @staticmethod

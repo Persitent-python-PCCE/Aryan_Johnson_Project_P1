@@ -1,5 +1,7 @@
 from app.extensions import db
 from app.models.venue import Venue
+from app.models.event import Event
+from app.models.seat import Seat
 
 
 class VenueRepository:
@@ -31,7 +33,9 @@ class VenueRepository:
 
     @staticmethod
     def get_all():
-        return Venue.query.order_by(Venue.name.asc()).all()
+        return Venue.query.order_by(
+            Venue.name.asc()
+        ).all()
 
     @staticmethod
     def get_by_city(city):
@@ -40,6 +44,28 @@ class VenueRepository:
             .filter(Venue.city == city)
             .order_by(Venue.name.asc())
             .all()
+        )
+
+    @staticmethod
+    def has_events(venue_id):
+        return (
+            db.session.query(Event.id)
+            .filter(
+                Event.venue_id == venue_id
+            )
+            .first()
+            is not None
+        )
+
+    @staticmethod
+    def has_seats(venue_id):
+        return (
+            db.session.query(Seat.id)
+            .filter(
+                Seat.venue_id == venue_id
+            )
+            .first()
+            is not None
         )
 
     @staticmethod

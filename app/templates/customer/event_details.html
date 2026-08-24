@@ -4,7 +4,12 @@
     {{ event.name }} - Ticket Booking System
 {% endblock %}
 
+
 {% block content %}
+
+<!-- =========================================================
+     PAGE HEADER
+     ========================================================= -->
 
 <div class="page-header">
 
@@ -15,8 +20,41 @@
         ← Back to Events
     </a>
 
+    <h1 style="margin-top: 15px;">
+        {{ event.name }}
+    </h1>
+
+    <p>
+        Event Details
+    </p>
+
 </div>
 
+
+<!-- =========================================================
+     EVENT POSTER
+     ========================================================= -->
+
+{% if event.posters %}
+
+    <div class="event-detail-poster">
+
+        <img
+            src="{{ url_for(
+                'customer.event_poster',
+                event_id=event.id
+            ) }}"
+            alt="{{ event.name }} poster"
+        >
+
+    </div>
+
+{% endif %}
+
+
+<!-- =========================================================
+     EVENT DETAILS CARD
+     ========================================================= -->
 
 <div class="card">
 
@@ -24,16 +62,23 @@
 
         <div>
 
-            <h1>
+            <h2>
                 {{ event.name }}
-            </h1>
+            </h2>
 
-            <p style="color: var(--text-light); margin-top: 4px;">
+            <p
+                style="
+                    color: var(--text-light);
+                    margin-top: 4px;
+                "
+            >
                 Event Details
             </p>
 
         </div>
 
+
+        <!-- Event Status -->
 
         {% if event.status == "PUBLISHED" %}
 
@@ -60,7 +105,13 @@
 
     <div class="card-body">
 
+        <!-- =====================================================
+             EVENT INFORMATION
+             ===================================================== -->
+
         <div class="booking-details">
+
+            <!-- Date -->
 
             <div class="detail-row">
 
@@ -75,6 +126,8 @@
             </div>
 
 
+            <!-- Time -->
+
             <div class="detail-row">
 
                 <span class="detail-label">
@@ -82,11 +135,15 @@
                 </span>
 
                 <span class="detail-value">
-                    {{ event.start_time }} - {{ event.end_time }}
+                    {{ event.start_time }}
+                    -
+                    {{ event.end_time }}
                 </span>
 
             </div>
 
+
+            <!-- Category -->
 
             <div class="detail-row">
 
@@ -97,15 +154,21 @@
                 <span class="detail-value">
 
                     {% if event.category %}
+
                         {{ event.category.name }}
+
                     {% else %}
+
                         N/A
+
                     {% endif %}
 
                 </span>
 
             </div>
 
+
+            <!-- Venue -->
 
             <div class="detail-row">
 
@@ -116,15 +179,21 @@
                 <span class="detail-value">
 
                     {% if event.venue %}
+
                         {{ event.venue.name }}
+
                     {% else %}
+
                         N/A
+
                     {% endif %}
 
                 </span>
 
             </div>
 
+
+            <!-- Location -->
 
             {% if event.venue %}
 
@@ -135,8 +204,10 @@
                     </span>
 
                     <span class="detail-value">
+
                         {{ event.venue.address }},
                         {{ event.venue.city }}
+
                     </span>
 
                 </div>
@@ -146,18 +217,32 @@
         </div>
 
 
+        <!-- =====================================================
+             DESCRIPTION
+             ===================================================== -->
+
         <div style="margin-top: 28px;">
 
             <h3>
                 About This Event
             </h3>
 
-            <p style="color: var(--text-light); margin-top: 8px;">
+            <p
+                style="
+                    color: var(--text-light);
+                    margin-top: 8px;
+                    line-height: 1.7;
+                "
+            >
                 {{ event.description or "No description available." }}
             </p>
 
         </div>
 
+
+        <!-- =====================================================
+             BOOKING ACTION
+             ===================================================== -->
 
         {% if event.status == "PUBLISHED" %}
 

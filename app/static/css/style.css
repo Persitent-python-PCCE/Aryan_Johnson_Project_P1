@@ -2935,3 +2935,538 @@ tbody tr:hover {
         min-width: 850px;
     }
 }
+
+/* =========================================================
+   ADMIN EVENT FORM
+   ========================================================= */
+
+.page-container {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+
+.form-section {
+    padding-bottom: 28px;
+    margin-bottom: 28px;
+    border-bottom: 1px solid var(--border);
+}
+
+
+.form-section:last-of-type {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+
+.form-section h2 {
+    margin: 0 0 18px;
+    font-size: 19px;
+}
+
+
+.form-section-description {
+    margin-top: -8px;
+    margin-bottom: 20px;
+    color: var(--text-light);
+    line-height: 1.6;
+}
+
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+}
+
+
+.form-grid-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+
+.form-help {
+    display: block;
+    margin-top: 7px;
+    color: var(--text-light);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   POSTER UPLOAD
+   ========================================================= */
+
+.poster-upload-box {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 30px;
+    align-items: start;
+
+    padding: 22px;
+
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+}
+
+
+.poster-preview-container {
+    width: 100%;
+}
+
+
+.poster-preview-label {
+    margin: 0 0 10px;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    color: var(--text-light);
+}
+
+
+.poster-preview {
+    display: block;
+
+    width: 100%;
+    max-height: 320px;
+
+    object-fit: cover;
+
+    border-radius: 10px;
+
+    border: 1px solid var(--border);
+
+    background: #ffffff;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 800px) {
+
+    .form-grid,
+    .form-grid-3 {
+        grid-template-columns: 1fr;
+    }
+
+
+    .poster-upload-box {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+/* =========================================================
+   EVENT DETAIL POSTER
+   ========================================================= */
+
+.event-detail-poster {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto 32px;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 28px rgba(15, 23, 42, 0.08);
+}
+
+.event-detail-poster img {
+    display: block;
+    width: 100%;
+    max-height: 520px;
+    object-fit: cover;
+}
+
+/* =========================================================
+   EVENT DETAILS POSTER
+   ========================================================= */
+
+.event-detail-poster {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto 32px;
+
+    border-radius: 16px;
+    overflow: hidden;
+
+    background: #f8fafc;
+    border: 1px solid var(--border);
+
+    box-shadow:
+        0 8px 28px rgba(15, 23, 42, 0.08);
+}
+
+
+.event-detail-poster img {
+    display: block;
+
+    width: 100%;
+    max-height: 520px;
+
+    object-fit: cover;
+}
+
+/* =========================================================
+   EVENT LISTING CARDS
+   ========================================================= */
+
+.event-card {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+}
+
+
+/* ---------------------------------------------------------
+   Poster
+   --------------------------------------------------------- */
+
+.event-card-poster {
+    width: 100%;
+    height: 240px;
+    overflow: hidden;
+    background: #f1f5f9;
+    border-radius: 12px 12px 0 0;
+}
+
+.event-card-poster img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+.event-card-poster-placeholder {
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    color: var(--text-light);
+    gap: 12px;
+}
+
+.poster-placeholder-icon {
+    width: 44px;
+    height: 44px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: var(--primary);
+    color: white;
+
+    font-weight: 700;
+    font-size: 18px;
+}
+
+
+/* ---------------------------------------------------------
+   Content
+   --------------------------------------------------------- */
+
+.event-card-content {
+    padding: 20px;
+}
+
+
+.event-card-top h3 {
+    margin: 0;
+}
+
+
+.event-category {
+    display: inline-block;
+
+    margin-top: 6px;
+
+    color: var(--primary);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+
+/* ---------------------------------------------------------
+   Description
+   --------------------------------------------------------- */
+
+.event-description {
+    margin-top: 14px;
+
+    color: var(--text-light);
+
+    line-height: 1.55;
+
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+
+    overflow: hidden;
+
+    min-height: 44px;
+}
+
+
+/* ---------------------------------------------------------
+   Metadata
+   --------------------------------------------------------- */
+
+.event-meta {
+    display: flex;
+    flex-direction: column;
+
+    gap: 8px;
+
+    margin-top: 18px;
+
+    color: var(--text-light);
+
+    font-size: 14px;
+}
+
+
+/* ---------------------------------------------------------
+   Actions
+   --------------------------------------------------------- */
+
+.event-actions {
+    display: flex;
+
+    gap: 10px;
+
+    margin-top: 20px;
+}
+
+
+.event-actions button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+
+/* ---------------------------------------------------------
+   Responsive
+   --------------------------------------------------------- */
+
+@media (max-width: 700px) {
+
+    .event-card-poster {
+        height: 200px;
+    }
+
+}
+
+/* =========================================================
+   FLASH NOTIFICATIONS
+   ========================================================= */
+
+.flash-container {
+    width: min(1100px, 92%);
+    margin: 20px auto 0;
+
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+
+.flash-message {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 16px;
+
+    padding: 14px 16px;
+
+    border-radius: 10px;
+
+    border: 1px solid transparent;
+
+    font-size: 14px;
+    line-height: 1.5;
+
+    box-shadow:
+        0 3px 10px rgba(15, 23, 42, 0.06);
+
+    transition:
+        opacity 0.25s ease,
+        transform 0.25s ease;
+}
+
+
+.flash-content {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    min-width: 0;
+}
+
+
+.flash-icon {
+    width: 24px;
+    height: 24px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    font-size: 13px;
+    font-weight: 700;
+}
+
+
+.flash-text {
+    word-break: break-word;
+}
+
+
+.flash-close {
+    width: 28px;
+    height: 28px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    border-radius: 6px;
+
+    background: transparent;
+
+    font-size: 20px;
+    line-height: 1;
+
+    cursor: pointer;
+
+    opacity: 0.6;
+
+    transition:
+        background 0.2s ease,
+        opacity 0.2s ease;
+}
+
+
+.flash-close:hover {
+    opacity: 1;
+}
+
+
+/* ---------------------------------------------------------
+   SUCCESS
+   --------------------------------------------------------- */
+
+.flash-success {
+    background: #ecfdf3;
+    border-color: #bbf7d0;
+    color: #166534;
+}
+
+
+.flash-success .flash-icon {
+    background: #22c55e;
+    color: white;
+}
+
+
+.flash-success .flash-close:hover {
+    background: #dcfce7;
+}
+
+
+/* ---------------------------------------------------------
+   ERROR / DANGER
+   --------------------------------------------------------- */
+
+.flash-danger {
+    background: #fef2f2;
+    border-color: #fecaca;
+    color: #991b1b;
+}
+
+
+.flash-danger .flash-icon {
+    background: #ef4444;
+    color: white;
+}
+
+
+.flash-danger .flash-close:hover {
+    background: #fee2e2;
+}
+
+
+/* ---------------------------------------------------------
+   WARNING
+   --------------------------------------------------------- */
+
+.flash-warning {
+    background: #fffbeb;
+    border-color: #fde68a;
+    color: #92400e;
+}
+
+
+.flash-warning .flash-icon {
+    background: #f59e0b;
+    color: white;
+}
+
+
+.flash-warning .flash-close:hover {
+    background: #fef3c7;
+}
+
+
+/* ---------------------------------------------------------
+   INFO
+   --------------------------------------------------------- */
+
+.flash-info {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+    color: #1e40af;
+}
+
+
+.flash-info .flash-icon {
+    background: #3b82f6;
+    color: white;
+}
+
+
+.flash-info .flash-close:hover {
+    background: #dbeafe;
+}
+
+
+/* ---------------------------------------------------------
+   AUTO DISMISS ANIMATION
+   --------------------------------------------------------- */
+
+.flash-hiding {
+    opacity: 0;
+    transform: translateY(-6px);
+}

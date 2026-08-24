@@ -4,6 +4,7 @@
     Browse Events
 {% endblock %}
 
+
 {% block content %}
 
 <div class="page-header">
@@ -18,6 +19,10 @@
 
 </div>
 
+
+<!-- =========================================================
+     SEARCH / FILTER SECTION
+     ========================================================= -->
 
 <div class="card filter-card">
 
@@ -131,7 +136,7 @@
             </div>
 
 
-            <div>
+            <div class="filter-actions">
 
                 <button
                     type="submit"
@@ -156,6 +161,10 @@
 </div>
 
 
+<!-- =========================================================
+     EVENTS
+     ========================================================= -->
+
 {% if events.items %}
 
     <div class="event-grid">
@@ -164,20 +173,67 @@
 
             <article class="card event-card">
 
-                <div class="event-card-top">
 
-                    <h3>
-                        {{ event.name }}
-                    </h3>
+                <!-- =================================================
+                     EVENT POSTER
+                     ================================================= -->
 
-                    <span>
-                        {{ event.category.name }}
-                    </span>
+                {% if event.posters %}
 
-                </div>
+                    <div class="event-card-poster">
+
+                        <img
+                            src="{{ url_for(
+                                'customer.event_poster',
+                                event_id=event.id
+                            ) }}"
+                            alt="{{ event.name }} poster"
+                            loading="lazy"
+                        >
+
+                    </div>
+
+                {% else %}
+
+                    <div class="event-card-poster event-card-poster-empty">
+
+                        <span>
+                            No Poster Available
+                        </span>
+
+                    </div>
+
+                {% endif %}
 
 
-                <div class="event-card-body">
+                <!-- =================================================
+                     EVENT INFORMATION
+                     ================================================= -->
+
+                <div class="event-card-content">
+
+                    <div class="event-card-top">
+
+                        <div>
+
+                            <h3>
+                                {{ event.name }}
+                            </h3>
+
+                            <span class="event-category">
+
+                                {% if event.category %}
+                                    {{ event.category.name }}
+                                {% else %}
+                                    Uncategorized
+                                {% endif %}
+
+                            </span>
+
+                        </div>
+
+                    </div>
+
 
                     {% if event.description %}
 
@@ -187,37 +243,73 @@
 
                         </p>
 
+                    {% else %}
+
+                        <p class="event-description">
+
+                            No description available.
+
+                        </p>
+
                     {% endif %}
 
+
+                    <!-- Event metadata -->
 
                     <div class="event-meta">
 
                         <div>
+
                             📅
-                            {{ event.event_date.strftime("%d %b %Y") }}
+
+                            {{ event.event_date.strftime(
+                                "%d %b %Y"
+                            ) }}
+
                         </div>
 
+
                         <div>
+
                             🕐
-                            {{ event.start_time.strftime("%H:%M") }}
+
+                            {{ event.start_time.strftime(
+                                "%H:%M"
+                            ) }}
+
                             -
-                            {{ event.end_time.strftime("%H:%M") }}
+
+                            {{ event.end_time.strftime(
+                                "%H:%M"
+                            ) }}
+
                         </div>
 
-                        <div>
-                            📍
-                            {{ event.venue.name }},
-                            {{ event.venue.city }}
-                        </div>
+
+                        {% if event.venue %}
+
+                            <div>
+
+                                📍
+
+                                {{ event.venue.name }},
+                                {{ event.venue.city }}
+
+                            </div>
+
+                        {% endif %}
+
 
                         <div>
+
+                            🎟
 
                             {% if seat_summary[event.id]["total"] > 0 %}
 
-                                🎟
                                 {{ seat_summary[event.id]["available"] }}
                                 /
                                 {{ seat_summary[event.id]["total"] }}
+
                                 seats available
 
                             {% else %}
@@ -231,6 +323,10 @@
                     </div>
 
 
+                    <!-- =================================================
+                         ACTION BUTTONS
+                         ================================================= -->
+
                     <div class="event-actions">
 
                         <a
@@ -243,15 +339,30 @@
                             Details
                         </a>
 
-                        <a
-                            href="{{ url_for(
-                                'customer.event_seats',
-                                event_id=event.id
-                            ) }}"
-                            class="btn btn-primary btn-small"
-                        >
-                            Select Seats
-                        </a>
+
+                        {% if seat_summary[event.id]["available"] > 0 %}
+
+                            <a
+                                href="{{ url_for(
+                                    'customer.event_seats',
+                                    event_id=event.id
+                                ) }}"
+                                class="btn btn-primary btn-small"
+                            >
+                                Select Seats
+                            </a>
+
+                        {% else %}
+
+                            <button
+                                type="button"
+                                class="btn btn-secondary btn-small"
+                                disabled
+                            >
+                                Sold Out
+                            </button>
+
+                        {% endif %}
 
                     </div>
 
@@ -264,56 +375,71 @@
     </div>
 
 
-    <div class="pagination">
+    <!-- =========================================================
+         PAGINATION
+         ========================================================= -->
 
-        {% if events.has_prev %}
+    {% if events.pages > 1 %}
 
-            <a
-                class="btn btn-secondary btn-small"
-                href="{{ url_for(
-                    'customer.events',
-                    page=events.prev_num,
-                    keyword=keyword,
-                    category_id=selected_category,
-                    venue_id=selected_venue,
-                    event_date=selected_date
-                ) }}"
-            >
-                ← Previous
-            </a>
+        <div class="pagination">
 
-        {% endif %}
+            {% if events.has_prev %}
 
+                <a
+                    class="btn btn-secondary btn-small"
+                    href="{{ url_for(
+                        'customer.events',
+                        page=events.prev_num,
+                        keyword=keyword,
+                        category_id=selected_category,
+                        venue_id=selected_venue,
+                        event_date=selected_date
+                    ) }}"
+                >
+                    ← Previous
+                </a>
 
-        <span class="pagination-info">
-
-            Page {{ events.page }}
-            of {{ events.pages }}
-
-        </span>
+            {% endif %}
 
 
-        {% if events.has_next %}
+            <span class="pagination-info">
 
-            <a
-                class="btn btn-secondary btn-small"
-                href="{{ url_for(
-                    'customer.events',
-                    page=events.next_num,
-                    keyword=keyword,
-                    category_id=selected_category,
-                    venue_id=selected_venue,
-                    event_date=selected_date
-                ) }}"
-            >
-                Next →
-            </a>
+                Page {{ events.page }}
+                of {{ events.pages }}
 
-        {% endif %}
+            </span>
 
-    </div>
+
+            {% if events.has_next %}
+
+                <a
+                    class="btn btn-secondary btn-small"
+                    href="{{ url_for(
+                        'customer.events',
+                        page=events.next_num,
+                        keyword=keyword,
+                        category_id=selected_category,
+                        venue_id=selected_venue,
+                        event_date=selected_date
+                    ) }}"
+                >
+                    Next →
+
+                </a>
+
+            {% endif %}
+
+        </div>
+
+    {% endif %}
+
 
 {% else %}
+
+
+    <!-- =========================================================
+         NO EVENTS
+         ========================================================= -->
 
     <div class="card">
 

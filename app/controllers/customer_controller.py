@@ -7,11 +7,15 @@ from flask import (
     render_template,
     request,
     session,
-    url_for
+    url_for,
+    send_file
 )
 
 from app.repositories.user_document_repository import (
     UserDocumentRepository
+)
+from app.repositories.event_poster_repository import (
+    EventPosterRepository
 )
 
 from app.services.event_service import EventService
@@ -361,6 +365,40 @@ def event_details(event_id):
     return render_template(
         "customer/event_details.html",
         event=event
+    )
+
+@customer_bp.route(
+    "/events/<int:event_id>/poster"
+)
+@role_required("CUSTOMER")
+def event_poster(event_id):
+
+    event = EventService.get_event(
+        event_id
+    )
+
+    posters = EventPosterRepository.get_by_event(
+        event.id
+    )
+
+    if not posters:
+        return (
+            "Poster not found",
+            404
+        )
+
+    # Latest uploaded poster
+    poster = posters[0]
+
+    if not poster.file_path:
+        return (
+            "Poster file not found",
+            404
+        )
+
+    return send_file(
+        poster.file_path,
+        mimetype=poster.mime_type
     )
 
 

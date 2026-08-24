@@ -1,7 +1,12 @@
+import os
+
 from app.repositories.category_repository import CategoryRepository
 from app.repositories.event_repository import EventRepository
 from app.repositories.venue_repository import VenueRepository
+from app.repositories.event_poster_repository import EventPosterRepository
+from app.services.file_service import FileService
 
+from app.extensions import db
 
 class EventService:
 
@@ -202,3 +207,32 @@ class EventService:
         )
 
         return True
+
+    @staticmethod
+    def delete_event(event_id):
+        event = EventRepository.get_by_id(event_id)
+
+        if not event:
+            raise ValueError("Event not found")
+
+        if EventRepository.has_bookings(event_id):
+            raise ValueError(
+                "Cannot delete this event because bookings already exist."
+            )
+
+        posters = EventPosterRepository.get_by_event(
+            event_id
+        )
+
+        for poster in posters:
+
+            if poster.file_path:
+                FileService.delete_file(
+                    poster.file_path
+                )
+
+            db.session.delete(poster)
+
+        EventRepository.delete(event)
+
+        return event

@@ -1,5 +1,6 @@
 from app.extensions import db
 from app.models.category import Category
+from app.models.event import Event
 
 
 class CategoryRepository:
@@ -37,6 +38,17 @@ class CategoryRepository:
             query
             .order_by(Category.name.asc())
             .all()
+        )
+
+    @staticmethod
+    def has_events(category_id):
+        return (
+            db.session.query(Event.id)
+            .filter(
+                Event.category_id == category_id
+            )
+            .first()
+            is not None
         )
 
     @staticmethod

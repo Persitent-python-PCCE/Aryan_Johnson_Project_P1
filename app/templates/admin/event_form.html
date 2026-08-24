@@ -1,169 +1,246 @@
 {% extends "base.html" %}
 
 {% block title %}
-    Create Event
+    Create Event - Admin
 {% endblock %}
 
 {% block content %}
 
-<div class="form-page">
+<div class="page-header">
 
-    <div class="page-header">
+    <h1>Create Event</h1>
 
-        <span class="eyebrow">
-            EVENT MANAGEMENT
-        </span>
+    <p>
+        Create and publish a new event for customers.
+    </p>
 
-        <h1>
-            Create Event
-        </h1>
-
-        <p class="page-subtitle">
-            Create an event and configure when and where it will take place.
-        </p>
-
-    </div>
+</div>
 
 
-    <div class="form-card">
+<div class="page-container">
 
-        <form
-            method="POST"
-            action="{{ url_for('admin.create_event') }}"
-        >
+    <div class="card">
 
-            <div class="form-section">
+        <div class="card-body">
 
-                <div class="form-section-title">
-                    Basic Information
-                </div>
+            <form
+                method="POST"
+                enctype="multipart/form-data"
+            >
 
+                <!-- =====================================================
+                     EVENT INFORMATION
+                     ===================================================== -->
 
-                <div class="form-group">
+                <div class="form-section">
 
-                    <label for="name">
-                        Event Name
-                    </label>
-
-                    <input
-                        type="text"
-                        id="name"
-                        name="name"
-                        required
-                        placeholder="e.g. Live Music Festival"
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label for="description">
-                        Description
-                    </label>
-
-                    <textarea
-                        id="description"
-                        name="description"
-                        rows="5"
-                        placeholder="Describe the event..."
-                    ></textarea>
-
-                </div>
-
-
-                <div class="form-grid">
+                    <h2>
+                        Event Information
+                    </h2>
 
                     <div class="form-group">
 
-                        <label for="category_id">
-                            Category
-                        </label>
-
-                        <select
-                            id="category_id"
-                            name="category_id"
-                            required
-                        >
-
-                            <option value="">
-                                Select category
-                            </option>
-
-                            {% for category in categories %}
-
-                                <option
-                                    value="{{ category.id }}"
-                                >
-                                    {{ category.name }}
-                                </option>
-
-                            {% endfor %}
-
-                        </select>
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label for="venue_id">
-                            Venue
-                        </label>
-
-                        <select
-                            id="venue_id"
-                            name="venue_id"
-                            required
-                        >
-
-                            <option value="">
-                                Select venue
-                            </option>
-
-                            {% for venue in venues %}
-
-                                <option
-                                    value="{{ venue.id }}"
-                                >
-                                    {{ venue.name }} — {{ venue.city }}
-                                </option>
-
-                            {% endfor %}
-
-                        </select>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <div class="form-section">
-
-                <div class="form-section-title">
-                    Schedule
-                </div>
-
-
-                <div class="form-grid">
-
-                    <div class="form-group">
-
-                        <label for="event_date">
-                            Event Date
+                        <label for="name">
+                            Event Name
                         </label>
 
                         <input
-                            type="date"
-                            id="event_date"
-                            name="event_date"
+                            type="text"
+                            id="name"
+                            name="name"
+                            class="form-control"
+                            placeholder="Enter event name"
                             required
+                            value="{{ request.form.get('name', '') }}"
                         >
 
                     </div>
 
+
+                    <div class="form-group">
+
+                        <label for="description">
+                            Description
+                        </label>
+
+                        <textarea
+                            id="description"
+                            name="description"
+                            class="form-control"
+                            rows="5"
+                            placeholder="Enter event description"
+                        >{{ request.form.get('description', '') }}</textarea>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =====================================================
+                     CATEGORY AND VENUE
+                     ===================================================== -->
+
+                <div class="form-section">
+
+                    <h2>
+                        Category & Venue
+                    </h2>
+
+                    <div class="form-grid">
+
+                        <div class="form-group">
+
+                            <label for="category_id">
+                                Category
+                            </label>
+
+                            <select
+                                id="category_id"
+                                name="category_id"
+                                class="form-control"
+                                required
+                            >
+
+                                <option value="">
+                                    Select category
+                                </option>
+
+                                {% for category in categories %}
+
+                                    <option
+                                        value="{{ category.id }}"
+                                        {% if request.form.get('category_id')|int == category.id %}
+                                            selected
+                                        {% endif %}
+                                    >
+                                        {{ category.name }}
+                                    </option>
+
+                                {% endfor %}
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="venue_id">
+                                Venue
+                            </label>
+
+                            <select
+                                id="venue_id"
+                                name="venue_id"
+                                class="form-control"
+                                required
+                            >
+
+                                <option value="">
+                                    Select venue
+                                </option>
+
+                                {% for venue in venues %}
+
+                                    <option
+                                        value="{{ venue.id }}"
+                                        {% if request.form.get('venue_id')|int == venue.id %}
+                                            selected
+                                        {% endif %}
+                                    >
+                                        {{ venue.name }}
+                                    </option>
+
+                                {% endfor %}
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =====================================================
+                     DATE AND TIME
+                     ===================================================== -->
+
+                <div class="form-section">
+
+                    <h2>
+                        Event Schedule
+                    </h2>
+
+                    <div class="form-grid form-grid-3">
+
+                        <div class="form-group">
+
+                            <label for="event_date">
+                                Event Date
+                            </label>
+
+                            <input
+                                type="date"
+                                id="event_date"
+                                name="event_date"
+                                class="form-control"
+                                required
+                                value="{{ request.form.get('event_date', '') }}"
+                            >
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="start_time">
+                                Start Time
+                            </label>
+
+                            <input
+                                type="time"
+                                id="start_time"
+                                name="start_time"
+                                class="form-control"
+                                required
+                                value="{{ request.form.get('start_time', '') }}"
+                            >
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="end_time">
+                                End Time
+                            </label>
+
+                            <input
+                                type="time"
+                                id="end_time"
+                                name="end_time"
+                                class="form-control"
+                                required
+                                value="{{ request.form.get('end_time', '') }}"
+                            >
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =====================================================
+                     STATUS
+                     ===================================================== -->
+
+                <div class="form-section">
+
+                    <h2>
+                        Event Status
+                    </h2>
 
                     <div class="form-group">
 
@@ -174,91 +251,222 @@
                         <select
                             id="status"
                             name="status"
+                            class="form-control"
                         >
 
-                            <option value="DRAFT">
+                            <option
+                                value="DRAFT"
+                                {% if request.form.get('status', 'DRAFT') == 'DRAFT' %}
+                                    selected
+                                {% endif %}
+                            >
                                 Draft
                             </option>
 
-                            <option value="PUBLISHED">
+                            <option
+                                value="PUBLISHED"
+                                {% if request.form.get('status') == 'PUBLISHED' %}
+                                    selected
+                                {% endif %}
+                            >
                                 Published
                             </option>
 
-                            <option value="CANCELLED">
+                            <option
+                                value="CANCELLED"
+                                {% if request.form.get('status') == 'CANCELLED' %}
+                                    selected
+                                {% endif %}
+                            >
                                 Cancelled
-                            </option>
-
-                            <option value="COMPLETED">
-                                Completed
                             </option>
 
                         </select>
 
-                    </div>
-
-                </div>
-
-
-                <div class="form-grid">
-
-                    <div class="form-group">
-
-                        <label for="start_time">
-                            Start Time
-                        </label>
-
-                        <input
-                            type="time"
-                            id="start_time"
-                            name="start_time"
-                            required
-                        >
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label for="end_time">
-                            End Time
-                        </label>
-
-                        <input
-                            type="time"
-                            id="end_time"
-                            name="end_time"
-                            required
-                        >
+                        <small class="form-help">
+                            Published events are visible to customers.
+                        </small>
 
                     </div>
 
                 </div>
 
-            </div>
+
+                <!-- =====================================================
+                     POSTER
+                     ===================================================== -->
+
+                <div class="form-section">
+
+                    <h2>
+                        Event Poster
+                    </h2>
+
+                    <p class="form-section-description">
+                        Upload an image that will be displayed on the
+                        customer event listing and event details page.
+                    </p>
 
 
-            <div class="form-actions">
+                    <div class="poster-upload-box">
 
-                <a
-                    href="{{ url_for('admin.events') }}"
-                    class="btn btn-secondary"
-                >
-                    Cancel
-                </a>
+                        <div class="form-group">
 
-                <button
-                    type="submit"
-                    class="btn btn-primary"
-                >
-                    Create Event
-                </button>
+                            <label for="poster">
+                                Poster Image
+                            </label>
 
-            </div>
+                            <input
+                                type="file"
+                                id="poster"
+                                name="poster"
+                                class="form-control"
+                                accept=".jpg,.jpeg,.png,.webp"
+                            >
 
-        </form>
+                            <small class="form-help">
+                                Accepted formats:
+                                JPG, JPEG, PNG, WEBP.
+                                Maximum size: 5 MB.
+                            </small>
+
+                        </div>
+
+
+                        <div
+                            id="poster-preview-container"
+                            class="poster-preview-container"
+                            style="display: none;"
+                        >
+
+                            <p class="poster-preview-label">
+                                Preview
+                            </p>
+
+                            <img
+                                id="poster-preview"
+                                class="poster-preview"
+                                src=""
+                                alt="Poster preview"
+                            >
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =====================================================
+                     ACTIONS
+                     ===================================================== -->
+
+                <div class="form-actions">
+
+                    <a
+                        href="{{ url_for('admin.events') }}"
+                        class="btn btn-secondary"
+                    >
+                        Cancel
+                    </a>
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                    >
+                        Create Event
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
 
     </div>
 
 </div>
+
+
+<script>
+
+const posterInput =
+    document.getElementById("poster");
+
+const previewContainer =
+    document.getElementById(
+        "poster-preview-container"
+    );
+
+const preview =
+    document.getElementById("poster-preview");
+
+
+posterInput.addEventListener(
+    "change",
+    function () {
+
+        const file = this.files[0];
+
+        if (!file) {
+
+            previewContainer.style.display = "none";
+
+            preview.src = "";
+
+            return;
+        }
+
+
+        const allowedTypes = [
+            "image/jpeg",
+            "image/png",
+            "image/webp"
+        ];
+
+
+        if (!allowedTypes.includes(file.type)) {
+
+            alert(
+                "Please select a JPG, JPEG, PNG, or WEBP image."
+            );
+
+            this.value = "";
+
+            previewContainer.style.display = "none";
+
+            return;
+        }
+
+
+        const maxSize =
+            5 * 1024 * 1024;
+
+
+        if (file.size > maxSize) {
+
+            alert(
+                "Poster size cannot exceed 5 MB."
+            );
+
+            this.value = "";
+
+            previewContainer.style.display = "none";
+
+            return;
+        }
+
+
+        const objectUrl =
+            URL.createObjectURL(file);
+
+        preview.src = objectUrl;
+
+        previewContainer.style.display = "block";
+
+    }
+);
+
+</script>
 
 {% endblock %}

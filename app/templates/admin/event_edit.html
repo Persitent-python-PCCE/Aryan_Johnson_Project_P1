@@ -19,11 +19,15 @@
         </h1>
 
         <p class="page-subtitle">
-            Update the details and schedule for this event.
+            Update the details, schedule, and poster for this event.
         </p>
 
     </div>
 
+
+    <!-- =========================================================
+         EVENT DETAILS
+         ========================================================= -->
 
     <div class="form-card">
 
@@ -140,6 +144,10 @@
             </div>
 
 
+            <!-- =====================================================
+                 SCHEDULE
+                 ===================================================== -->
+
             <div class="form-section">
 
                 <div class="form-section-title">
@@ -242,6 +250,10 @@
             </div>
 
 
+            <!-- =====================================================
+                 ACTIONS
+                 ===================================================== -->
+
             <div class="form-actions">
 
                 <a
@@ -261,6 +273,153 @@
             </div>
 
         </form>
+
+    </div>
+
+
+    <!-- =========================================================
+         EVENT POSTER
+         ========================================================= -->
+
+    <div class="form-card" style="margin-top: 24px;">
+
+        <div class="form-section">
+
+            <div class="form-section-title">
+                Event Poster
+            </div>
+
+            <p class="page-subtitle">
+                Upload or replace the poster displayed for this event.
+            </p>
+
+
+            {% if event.posters %}
+
+                <div
+                    style="
+                        margin-top: 20px;
+                        margin-bottom: 24px;
+                    "
+                >
+
+                    <div class="form-group">
+
+                        <label>
+                            Current Poster
+                        </label>
+
+                        <div
+                            style="
+                                margin-top: 10px;
+                                max-width: 420px;
+                            "
+                        >
+
+                            <img
+                                src="{{ url_for(
+                                    'customer.event_poster',
+                                    event_id=event.id
+                                ) }}"
+                                alt="{{ event.name }} poster"
+                                style="
+                                    display: block;
+                                    width: 100%;
+                                    max-height: 300px;
+                                    object-fit: cover;
+                                    border-radius: 10px;
+                                    border: 1px solid #e5e7eb;
+                                "
+                            >
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            {% else %}
+
+                <div
+                    style="
+                        margin-top: 20px;
+                        margin-bottom: 24px;
+                        padding: 30px;
+                        text-align: center;
+                        border: 1px dashed #d1d5db;
+                        border-radius: 10px;
+                        background: #f8fafc;
+                    "
+                >
+
+                    <p style="margin: 0;">
+                        No poster has been uploaded for this event.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+
+            <form
+                method="POST"
+                action="{{ url_for(
+                    'admin.upload_event_poster',
+                    event_id=event.id
+                ) }}"
+                enctype="multipart/form-data"
+            >
+
+                <div class="form-group">
+
+                    <label for="poster">
+                        {% if event.posters %}
+                            Replace Poster
+                        {% else %}
+                            Upload Poster
+                        {% endif %}
+                    </label>
+
+                    <input
+                        type="file"
+                        id="poster"
+                        name="poster"
+                        accept=".jpg,.jpeg,.png,.webp"
+                        required
+                    >
+
+                    <p
+                        style="
+                            margin-top: 8px;
+                            font-size: 0.875rem;
+                            color: #6b7280;
+                        "
+                    >
+                        Accepted formats: JPG, JPEG, PNG, WEBP.
+                        Maximum file size: 5 MB.
+                    </p>
+
+                </div>
+
+
+                <div class="form-actions">
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                    >
+                        {% if event.posters %}
+                            Replace Poster
+                        {% else %}
+                            Upload Poster
+                        {% endif %}
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
 
     </div>
 

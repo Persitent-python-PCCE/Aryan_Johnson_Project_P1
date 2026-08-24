@@ -60,3 +60,24 @@ class VenueService:
         venue = VenueService.get_venue(venue_id)
 
         VenueRepository.delete(venue)
+
+    @staticmethod
+    def delete_venue(venue_id):
+        venue = VenueRepository.get_by_id(venue_id)
+
+        if not venue:
+            raise ValueError("Venue not found")
+
+        if VenueRepository.has_events(venue_id):
+            raise ValueError(
+                "Cannot delete this venue because events are using it."
+            )
+
+        if VenueRepository.has_seats(venue_id):
+            raise ValueError(
+                "Cannot delete this venue because seats are configured for it."
+            )
+
+        VenueRepository.delete(venue)
+
+        return venue
