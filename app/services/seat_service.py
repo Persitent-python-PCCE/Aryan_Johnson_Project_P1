@@ -2,6 +2,7 @@ from decimal import Decimal, InvalidOperation
 
 from app.repositories.seat_repository import SeatRepository
 from app.repositories.venue_repository import VenueRepository
+from app.repositories.event_repository import EventRepository
 
 
 class SeatService:
@@ -169,3 +170,44 @@ class SeatService:
         SeatRepository.delete(seat)
 
         return True
+
+    @staticmethod
+    def get_event_seat_summary(event_id):
+        available = SeatRepository.get_available_for_event(
+            event_id
+        )
+
+        total = SeatRepository.count_by_venue(
+            available[0].venue_id
+        ) if available else 0
+
+        return {
+            "available": len(available),
+            "total": total
+        }
+
+    @staticmethod
+    def get_available_seats(event_id):
+        return SeatRepository.get_available_for_event(
+            event_id
+        )
+
+    @staticmethod
+    def get_event_seat_summary(event_id):
+        event = EventRepository.get_by_id(event_id)
+
+        if not event:
+            raise ValueError("Event not found")
+
+        total = SeatRepository.count_by_venue(
+            event.venue_id
+        )
+
+        available = SeatRepository.count_available_for_event(
+            event_id
+        )
+
+        return {
+            "available": available,
+            "total": total
+        }

@@ -44,11 +44,6 @@ class BookingService:
 
         try:
             locked_seats = []
-
-            # Lock every requested seat in deterministic order.
-            #
-            # Sorting ensures concurrent transactions acquire
-            # multiple seat locks in the same order.
             for seat_id in sorted(seat_ids):
                 seat = SeatRepository.get_by_id_for_update(
                     seat_id
