@@ -6,15 +6,31 @@
 
 {% block content %}
 
-<div class="page-header">
+<div class="page-header page-header-row">
 
-    <h1>
-        Explore Events
-    </h1>
+    <div>
 
-    <p>
-        Find events, explore available seats, and book your tickets.
-    </p>
+        <span class="eyebrow">
+            EVENT MANAGEMENT
+        </span>
+
+        <h1>
+            Events
+        </h1>
+
+        <p class="page-subtitle">
+            Create and manage events, schedules, posters, and availability.
+        </p>
+
+    </div>
+
+
+    <a
+        href="{{ url_for('admin.create_event') }}"
+        class="btn btn-primary"
+    >
+        + Create Event
+    </a>
 
 </div>
 

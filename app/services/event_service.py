@@ -193,23 +193,6 @@ class EventService:
 
     @staticmethod
     def delete_event(event_id):
-        event = EventService.get_event(
-            event_id
-        )
-
-        if event.status == "PUBLISHED":
-            raise ValueError(
-                "Published events cannot be deleted"
-            )
-
-        EventRepository.delete(
-            event
-        )
-
-        return True
-
-    @staticmethod
-    def delete_event(event_id):
         event = EventRepository.get_by_id(event_id)
 
         if not event:

@@ -278,14 +278,98 @@ def delete_venue(venue_id):
 @admin_bp.route("/events")
 @role_required("ADMIN")
 def events():
+
+    # ----------------------------------------------------
+    # Read filters from query parameters
+    # ----------------------------------------------------
+
+    keyword = request.args.get(
+        "keyword",
+        ""
+    ).strip()
+
+    category_id = request.args.get(
+        "category_id",
+        type=int
+    )
+
+    venue_id = request.args.get(
+        "venue_id",
+        type=int
+    )
+
+    event_date = request.args.get(
+        "event_date",
+        ""
+    ).strip()
+
+
+    # ----------------------------------------------------
+    # Convert date string to date object
+    # ----------------------------------------------------
+
+    parsed_event_date = None
+
+    if event_date:
+
+        try:
+
+            parsed_event_date = date.fromisoformat(
+                event_date
+            )
+
+        except ValueError:
+
+            flash(
+                "Invalid event date.",
+                "danger"
+            )
+
+            event_date = ""
+
+
+    # ----------------------------------------------------
+    # Search events
+    # ----------------------------------------------------
+
     result = EventService.search_events(
-        page=1,
+        keyword=keyword or None,
+        category_id=category_id,
+        venue_id=venue_id,
+        event_date=parsed_event_date,
+        page=request.args.get(
+            "page",
+            1,
+            type=int
+        ),
         per_page=100
     )
 
+
+    # ----------------------------------------------------
+    # Filter dropdown data
+    # ----------------------------------------------------
+
+    categories = CategoryService.get_categories(
+        active_only=True
+    )
+
+    venues = VenueService.get_venues()
+
+
+    # ----------------------------------------------------
+    # Render page
+    # ----------------------------------------------------
+
     return render_template(
         "admin/events.html",
-        events=result
+        events=result,
+        categories=categories,
+        venues=venues,
+        keyword=keyword,
+        selected_category=category_id,
+        selected_venue=venue_id,
+        selected_date=event_date
     )
 
 

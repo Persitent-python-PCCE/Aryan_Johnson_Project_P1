@@ -320,7 +320,7 @@ def events():
         event_date=parsed_date,
         status="PUBLISHED",
         page=page,
-        per_page=10
+        per_page=9
     )
 
     categories = CategoryService.get_categories(
