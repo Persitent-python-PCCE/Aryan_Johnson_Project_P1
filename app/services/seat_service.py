@@ -1,15 +1,37 @@
-from app.repositories.event_repository import EventRepository
+from decimal import Decimal, InvalidOperation
+
 from app.repositories.seat_repository import SeatRepository
 from app.repositories.venue_repository import VenueRepository
 
 
 class SeatService:
 
-    ALLOWED_SEAT_TYPES = {
+    VALID_SEAT_TYPES = {
         "REGULAR",
         "PREMIUM",
         "VIP"
     }
+
+    @staticmethod
+    def get_seats_by_venue(venue_id):
+        venue = VenueRepository.get_by_id(venue_id)
+
+        if not venue:
+            raise ValueError("Venue not found")
+
+        return SeatRepository.get_by_venue(
+            venue_id,
+            active_only=False
+        )
+
+    @staticmethod
+    def get_seat(seat_id):
+        seat = SeatRepository.get_by_id(seat_id)
+
+        if not seat:
+            raise ValueError("Seat not found")
+
+        return seat
 
     @staticmethod
     def create_seat(
@@ -25,29 +47,44 @@ class SeatService:
         if not venue:
             raise ValueError("Venue not found")
 
+        if not seat_number or not seat_number.strip():
+            raise ValueError("Seat number is required")
+
+        try:
+            row_number = int(row_number)
+        except (TypeError, ValueError):
+            raise ValueError("Row number must be a valid integer")
+
         if row_number <= 0:
             raise ValueError(
                 "Row number must be greater than zero"
             )
 
-        if price < 0:
-            raise ValueError(
-                "Seat price cannot be negative"
-            )
+        seat_type = (seat_type or "REGULAR").strip().upper()
 
-        if seat_type not in SeatService.ALLOWED_SEAT_TYPES:
+        if seat_type not in SeatService.VALID_SEAT_TYPES:
             raise ValueError("Invalid seat type")
+
+        try:
+            price = Decimal(str(price))
+        except (InvalidOperation, ValueError, TypeError):
+            raise ValueError("Price must be a valid number")
+
+        if price < Decimal("0.00"):
+            raise ValueError("Price cannot be negative")
+
+        seat_number = seat_number.strip().upper()
 
         existing_seats = SeatRepository.get_by_venue(
             venue_id
         )
 
         if any(
-            seat.seat_number == seat_number
+            seat.seat_number.upper() == seat_number
             for seat in existing_seats
         ):
             raise ValueError(
-                "Seat number already exists for this venue"
+                "A seat with this seat number already exists"
             )
 
         return SeatRepository.create(
@@ -60,106 +97,75 @@ class SeatService:
         )
 
     @staticmethod
-    def get_seat(seat_id):
-        seat = SeatRepository.get_by_id(seat_id)
-
-        if not seat:
-            raise ValueError("Seat not found")
-
-        return seat
-
-    @staticmethod
-    def get_venue_seats(
-        venue_id,
-        active_only=False
+    def update_seat(
+        seat_id,
+        seat_number,
+        row_number,
+        seat_type,
+        price,
+        is_active=True
     ):
-        venue = VenueRepository.get_by_id(venue_id)
-
-        if not venue:
-            raise ValueError("Venue not found")
-
-        return SeatRepository.get_by_venue(
-            venue_id,
-            active_only=active_only
-        )
-
-    @staticmethod
-    def get_available_seats(event_id):
-        event = EventRepository.get_by_id(event_id)
-
-        if not event:
-            raise ValueError("Event not found")
-
-        return SeatRepository.get_available_for_event(
-            event_id
-        )
-
-    @staticmethod
-    def update_seat(seat_id, **kwargs):
         seat = SeatService.get_seat(seat_id)
 
-        if "row_number" in kwargs:
-            if kwargs["row_number"] <= 0:
-                raise ValueError(
-                    "Row number must be greater than zero"
-                )
+        if not seat_number or not seat_number.strip():
+            raise ValueError("Seat number is required")
 
-        if "price" in kwargs:
-            if kwargs["price"] < 0:
-                raise ValueError(
-                    "Seat price cannot be negative"
-                )
+        try:
+            row_number = int(row_number)
+        except (TypeError, ValueError):
+            raise ValueError("Row number must be a valid integer")
 
-        if "seat_type" in kwargs:
-            if kwargs["seat_type"] not in SeatService.ALLOWED_SEAT_TYPES:
-                raise ValueError("Invalid seat type")
-
-        if "seat_number" in kwargs:
-            existing_seats = SeatRepository.get_by_venue(
-                seat.venue_id
+        if row_number <= 0:
+            raise ValueError(
+                "Row number must be greater than zero"
             )
 
-            for existing_seat in existing_seats:
-                if (
-                    existing_seat.id != seat.id
-                    and existing_seat.seat_number
-                    == kwargs["seat_number"]
-                ):
-                    raise ValueError(
-                        "Seat number already exists for this venue"
-                    )
+        seat_type = (seat_type or "REGULAR").strip().upper()
+
+        if seat_type not in SeatService.VALID_SEAT_TYPES:
+            raise ValueError("Invalid seat type")
+
+        try:
+            price = Decimal(str(price))
+        except (InvalidOperation, ValueError, TypeError):
+            raise ValueError("Price must be a valid number")
+
+        if price < Decimal("0.00"):
+            raise ValueError("Price cannot be negative")
+
+        seat_number = seat_number.strip().upper()
+
+        existing_seats = SeatRepository.get_by_venue(
+            seat.venue_id
+        )
+
+        for existing in existing_seats:
+            if (
+                existing.id != seat.id
+                and existing.seat_number.upper() == seat_number
+            ):
+                raise ValueError(
+                    "A seat with this seat number already exists"
+                )
 
         return SeatRepository.update(
             seat,
-            **kwargs
+            seat_number=seat_number,
+            row_number=row_number,
+            seat_type=seat_type,
+            price=price,
+            is_active=is_active
         )
 
     @staticmethod
-    def deactivate_seat(seat_id):
+    def delete_seat(seat_id):
         seat = SeatService.get_seat(seat_id)
 
-        return SeatRepository.update(
-            seat,
-            is_active=False
-        )
+        if seat.booking_items:
+            raise ValueError(
+                "Cannot delete a seat that has booking history"
+            )
 
+        SeatRepository.delete(seat)
 
-    @staticmethod
-    def get_event_seat_summary(event_id):
-        event = EventRepository.get_by_id(event_id)
-
-        if not event:
-            raise ValueError("Event not found")
-
-        total_seats = SeatRepository.count_by_venue(
-            event.venue_id
-        )
-
-        available_seats = SeatRepository.count_available_for_event(
-            event_id
-        )
-
-        return {
-            "total": total_seats,
-            "available": available_seats
-        }
+        return True

@@ -16,7 +16,7 @@
         </h1>
 
         <p class="page-subtitle">
-            Manage events, venues, categories and customer bookings
+            Manage events, venues, categories, seats and customer bookings
             from one place.
         </p>
     </div>
@@ -25,6 +25,8 @@
 
 
 <div class="admin-stat-grid">
+
+    <!-- Categories -->
 
     <a
         href="{{ url_for('admin.categories') }}"
@@ -54,6 +56,8 @@
     </a>
 
 
+    <!-- Venues -->
+
     <a
         href="{{ url_for('admin.venues') }}"
         class="admin-stat-card"
@@ -82,6 +86,38 @@
     </a>
 
 
+    <!-- Seats -->
+
+    <a
+        href="{{ url_for('admin.seats') }}"
+        class="admin-stat-card"
+    >
+
+        <div class="admin-stat-icon">
+            S
+        </div>
+
+        <div>
+
+            <h3>
+                Seats
+            </h3>
+
+            <p>
+                Manage seats and ticket prices
+            </p>
+
+        </div>
+
+        <span class="admin-card-arrow">
+            →
+        </span>
+
+    </a>
+
+
+    <!-- Events -->
+
     <a
         href="{{ url_for('admin.events') }}"
         class="admin-stat-card"
@@ -109,6 +145,8 @@
 
     </a>
 
+
+    <!-- Bookings -->
 
     <a
         href="{{ url_for('admin.bookings') }}"
@@ -154,7 +192,8 @@
 
         <p>
             Use the management sections above to maintain the
-            booking platform and monitor customer activity.
+            booking platform, configure venue seating and pricing,
+            manage events, and monitor customer activity.
         </p>
 
     </div>

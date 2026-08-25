@@ -5,11 +5,11 @@ import os
 from app.config import Config
 from app.services.file_service import FileService
 from app.repositories.event_poster_repository import EventPosterRepository
-
 from app.services.event_service import EventService
 from app.services.category_service import CategoryService
 from app.services.venue_service import VenueService
 from app.services.booking_service import BookingService
+from app.services.seat_service import SeatService
 
 from flask import (
     Blueprint,
@@ -270,6 +270,294 @@ def delete_venue(venue_id):
         url_for("admin.venues")
     )
 
+# ---------------------------------------------------------------------------
+# Seats
+# ---------------------------------------------------------------------------
+
+@admin_bp.route("/seats")
+@role_required("ADMIN")
+def seats():
+    venue_id = request.args.get(
+        "venue_id",
+        type=int
+    )
+
+    venues = VenueService.get_venues()
+
+    selected_venue = None
+    seats = []
+
+    if venue_id:
+        selected_venue = next(
+            (
+                venue
+                for venue in venues
+                if venue.id == venue_id
+            ),
+            None
+        )
+
+        if not selected_venue:
+            flash(
+                "Venue not found.",
+                "danger"
+            )
+        else:
+            seats = SeatService.get_seats_by_venue(
+                venue_id
+            )
+
+    return render_template(
+        "admin/seats.html",
+        venues=venues,
+        seats=seats,
+        selected_venue=venue_id
+    )
+
+
+@admin_bp.route(
+    "/seats/create",
+    methods=["GET", "POST"]
+)
+@role_required("ADMIN")
+def create_seat():
+
+    venues = VenueService.get_venues()
+
+    if request.method == "GET":
+        return render_template(
+            "admin/seat_form.html",
+            venues=venues,
+            seat=None
+        )
+
+    venue_id = request.form.get(
+        "venue_id",
+        type=int
+    )
+
+    seat_number = request.form.get(
+        "seat_number",
+        ""
+    ).strip()
+
+    row_number = request.form.get(
+        "row_number",
+        ""
+    ).strip()
+
+    seat_type = request.form.get(
+        "seat_type",
+        "REGULAR"
+    ).strip()
+
+    price = request.form.get(
+        "price",
+        ""
+    ).strip()
+
+    is_active = (
+        request.form.get("is_active") == "on"
+    )
+
+    try:
+        SeatService.create_seat(
+            venue_id=venue_id,
+            seat_number=seat_number,
+            row_number=row_number,
+            seat_type=seat_type,
+            price=price,
+            is_active=is_active
+        )
+
+        db.session.commit()
+
+        flash(
+            "Seat created successfully.",
+            "success"
+        )
+
+        return redirect(
+            url_for(
+                "admin.seats",
+                venue_id=venue_id
+            )
+        )
+
+    except ValueError as exc:
+
+        db.session.rollback()
+
+        flash(
+            str(exc),
+            "danger"
+        )
+
+        return render_template(
+            "admin/seat_form.html",
+            venues=venues,
+            seat=None
+        )
+
+    except Exception:
+
+        db.session.rollback()
+        raise
+
+
+@admin_bp.route(
+    "/seats/<int:seat_id>/edit",
+    methods=["GET", "POST"]
+)
+@role_required("ADMIN")
+def edit_seat(seat_id):
+
+    try:
+        seat = SeatService.get_seat(
+            seat_id
+        )
+
+    except ValueError as exc:
+
+        flash(
+            str(exc),
+            "danger"
+        )
+
+        return redirect(
+            url_for("admin.seats")
+        )
+
+    venues = VenueService.get_venues()
+
+    if request.method == "GET":
+
+        return render_template(
+            "admin/seat_form.html",
+            venues=venues,
+            seat=seat
+        )
+
+    seat_number = request.form.get(
+        "seat_number",
+        ""
+    ).strip()
+
+    row_number = request.form.get(
+        "row_number",
+        ""
+    ).strip()
+
+    seat_type = request.form.get(
+        "seat_type",
+        "REGULAR"
+    ).strip()
+
+    price = request.form.get(
+        "price",
+        ""
+    ).strip()
+
+    is_active = (
+        request.form.get("is_active") == "on"
+    )
+
+    try:
+
+        SeatService.update_seat(
+            seat_id=seat_id,
+            seat_number=seat_number,
+            row_number=row_number,
+            seat_type=seat_type,
+            price=price,
+            is_active=is_active
+        )
+
+        db.session.commit()
+
+        flash(
+            "Seat updated successfully.",
+            "success"
+        )
+
+        return redirect(
+            url_for(
+                "admin.seats",
+                venue_id=seat.venue_id
+            )
+        )
+
+    except ValueError as exc:
+
+        db.session.rollback()
+
+        flash(
+            str(exc),
+            "danger"
+        )
+
+        return render_template(
+            "admin/seat_form.html",
+            venues=venues,
+            seat=seat
+        )
+
+    except Exception:
+
+        db.session.rollback()
+        raise
+
+
+@admin_bp.route(
+    "/seats/<int:seat_id>/delete",
+    methods=["POST"]
+)
+@role_required("ADMIN")
+def delete_seat(seat_id):
+
+    try:
+
+        seat = SeatService.get_seat(
+            seat_id
+        )
+
+        venue_id = seat.venue_id
+
+        SeatService.delete_seat(
+            seat_id
+        )
+
+        db.session.commit()
+
+        flash(
+            "Seat deleted successfully.",
+            "success"
+        )
+
+        return redirect(
+            url_for(
+                "admin.seats",
+                venue_id=venue_id
+            )
+        )
+
+    except ValueError as exc:
+
+        db.session.rollback()
+
+        flash(
+            str(exc),
+            "danger"
+        )
+
+        return redirect(
+            url_for("admin.seats")
+        )
+
+    except Exception:
+
+        db.session.rollback()
+        raise
 
 # ---------------------------------------------------------------------------
 # Events

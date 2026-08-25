@@ -1,0 +1,308 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if seat %}
+        Edit Seat
+    {% else %}
+        Add Seat
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+
+<div class="form-page">
+
+    <div class="page-header">
+
+        <span class="eyebrow">
+            SEAT MANAGEMENT
+        </span>
+
+        <h1>
+
+            {% if seat %}
+                Edit Seat
+            {% else %}
+                Add Seat
+            {% endif %}
+
+        </h1>
+
+        <p class="page-subtitle">
+            Configure the seat and its ticket price.
+        </p>
+
+    </div>
+
+
+    <div class="form-card">
+
+        <form
+            method="POST"
+
+            {% if seat %}
+
+                action="{{ url_for(
+                    'admin.edit_seat',
+                    seat_id=seat.id
+                ) }}"
+
+            {% else %}
+
+                action="{{ url_for(
+                    'admin.create_seat'
+                ) }}"
+
+            {% endif %}
+        >
+
+
+            <div class="form-section">
+
+                <div class="form-section-title">
+                    Seat Information
+                </div>
+
+
+                {% if not seat %}
+
+                    <div class="form-group">
+
+                        <label for="venue_id">
+                            Venue
+                        </label>
+
+                        <select
+                            id="venue_id"
+                            name="venue_id"
+                            required
+                        >
+
+                            <option value="">
+                                Select Venue
+                            </option>
+
+                            {% for venue in venues %}
+
+                                <option
+                                    value="{{ venue.id }}"
+                                >
+                                    {{ venue.name }}
+                                    —
+                                    {{ venue.city }}
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+                {% else %}
+
+                    <div class="form-group">
+
+                        <label>
+                            Venue
+                        </label>
+
+                        <input
+                            type="text"
+                            value="{{ seat.venue.name }} — {{ seat.venue.city }}"
+                            disabled
+                        >
+
+                    </div>
+
+                {% endif %}
+
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+
+                        <label for="seat_number">
+                            Seat Number
+                        </label>
+
+                        <input
+                            type="text"
+                            id="seat_number"
+                            name="seat_number"
+
+                            {% if seat %}
+                                value="{{ seat.seat_number }}"
+                            {% endif %}
+
+                            placeholder="Example: A1"
+                            maxlength="20"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="row_number">
+                            Row Number
+                        </label>
+
+                        <input
+                            type="number"
+                            id="row_number"
+                            name="row_number"
+
+                            {% if seat %}
+                                value="{{ seat.row_number }}"
+                            {% endif %}
+
+                            min="1"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+
+                        <label for="seat_type">
+                            Seat Type
+                        </label>
+
+                        <select
+                            id="seat_type"
+                            name="seat_type"
+                            required
+                        >
+
+                            {% for seat_type in [
+                                "REGULAR",
+                                "PREMIUM",
+                                "VIP"
+                            ] %}
+
+                                <option
+                                    value="{{ seat_type }}"
+
+                                    {% if seat
+                                        and seat.seat_type == seat_type %}
+                                        selected
+
+                                    {% elif not seat
+                                        and seat_type == "REGULAR" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    {{ seat_type|title }}
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="price">
+                            Ticket Price (₹)
+                        </label>
+
+                        <input
+                            type="number"
+                            id="price"
+                            name="price"
+
+                            {% if seat %}
+                                value="{{ seat.price }}"
+                            {% endif %}
+
+                            min="0"
+                            step="0.01"
+                            placeholder="Example: 500.00"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+
+                        <input
+                            type="checkbox"
+                            name="is_active"
+
+                            {% if not seat or seat.is_active %}
+                                checked
+                            {% endif %}
+                        >
+
+                        Active seat
+
+                    </label>
+
+                </div>
+
+            </div>
+
+
+            <div class="form-actions">
+
+                {% if seat %}
+
+                    <a
+                        href="{{ url_for(
+                            'admin.seats',
+                            venue_id=seat.venue_id
+                        ) }}"
+                        class="btn btn-secondary"
+                    >
+                        Cancel
+                    </a>
+
+                {% else %}
+
+                    <a
+                        href="{{ url_for(
+                            'admin.seats'
+                        ) }}"
+                        class="btn btn-secondary"
+                    >
+                        Cancel
+                    </a>
+
+                {% endif %}
+
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                >
+
+                    {% if seat %}
+                        Save Changes
+                    {% else %}
+                        Create Seat
+                    {% endif %}
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}
