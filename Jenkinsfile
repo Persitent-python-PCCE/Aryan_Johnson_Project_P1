@@ -74,7 +74,7 @@ pipeline {
             emailext(
                 subject: "SUCCESS ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                 body: """
-                    <h2>Jenkins build Successful</h2>
+                    <h2>Jenkins build Successful!!</h2>
                     <p>
                         <b>URL</b>: ${env.BUILD_URL}
                     </p>
