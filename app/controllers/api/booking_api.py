@@ -11,19 +11,6 @@ from app.services.booking_service import BookingService
 
 
 def get_authenticated_customer_id():
-    """
-    Verify the access JWT and return the authenticated
-    customer's user ID.
-
-    Returns:
-        int: Customer user ID when authentication succeeds.
-        None: When the JWT is valid but the user is not a CUSTOMER
-               or the identity is invalid.
-
-    Raises:
-        JWT-related exceptions when the request does not contain
-        a valid access token.
-    """
 
     verify_jwt_in_request()
 

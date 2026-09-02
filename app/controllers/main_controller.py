@@ -17,7 +17,7 @@ def health_check():
     return jsonify(
         {
             "status": "success",
-            "message": "Ticket Booking API is running"
+            "message": "Ticket Booking API v2 is running"
         }
     )
 

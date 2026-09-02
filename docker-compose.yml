@@ -1,0 +1,52 @@
+services:
+
+  flask-app:
+    build: .
+    container_name: flask-app
+
+    ports:
+      - "5000:5000"
+
+    env_file:
+      - .env
+
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+
+    networks:
+      - ticket-net
+
+
+  mysql-db:
+    image: mysql:9.7.2
+    container_name: mysql-db
+
+    environment:
+      MYSQL_ROOT_PASSWORD: aryan2004
+      MYSQL_DATABASE: ticket_booking
+
+    ports:
+      - "3309:3306"
+
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -paryan2004 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+    networks:
+      - ticket-net
+
+
+volumes:
+  mysql-data:
+
+
+networks:
+  ticket-net:
+    driver: bridge
