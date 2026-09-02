@@ -18,14 +18,14 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 echo 'Installing Python dependencies...'
-                sh 'pip3 install --break-system-packages -r requirements.txt'
+                sh 'python3 -m pip install --break-system-packages -r requirements.txt'
             }
         }
 
         stage('Test') {
             steps {
                 echo 'Running tests...'
-                sh 'pytest'
+                sh 'python3 -m pytest'
             }
         }
 
@@ -56,6 +56,8 @@ pipeline {
                         docker push ${DOCKER_IMAGE}:${BUILD_NUMBER}
 
                         docker push ${DOCKER_IMAGE}:latest
+
+                        docker logout
                     '''
                 }
             }
