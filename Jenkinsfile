@@ -2,6 +2,10 @@ pipeline {
 
     agent any
 
+    triggers {
+        githubPush()
+    }
+
     environment {
         DOCKER_IMAGE = 'aryanjohnson/ticket-booking-app'
     }
@@ -67,11 +71,29 @@ pipeline {
     post {
 
         success {
-            echo 'CI/CD Pipeline completed successfully!'
+            emailext(
+                subject: "SUCCESS ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """
+                    <h2>Jenkins build Successful</h2>
+                    <p>
+                        <b>URL</b>: ${env.BUILD_URL}
+                    </p>
+                """,
+                to: "aryanjohnson1307@gmail.com"
+            )
         }
 
         failure {
-            echo 'CI/CD Pipeline failed.'
+            emailext(
+                subject: "FAILED ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """
+                    <h2>Jenkins build Failed</h2>
+                    <p>
+                        <b>URL</b>: ${env.BUILD_URL}
+                    </p>
+                """,
+                to: "aryanjohnson1307@gmail.com"
+            )
         }
     }
 }
